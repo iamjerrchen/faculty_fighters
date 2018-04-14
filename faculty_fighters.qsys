@@ -17,38 +17,6 @@
          type = "String";
       }
    }
-   element accumulator
-   {
-      datum _sortIndex
-      {
-         value = "6";
-         type = "int";
-      }
-   }
-   element accumulator.s1
-   {
-      datum baseAddress
-      {
-         value = "48";
-         type = "String";
-      }
-   }
-   element clear
-   {
-      datum _sortIndex
-      {
-         value = "7";
-         type = "int";
-      }
-   }
-   element clear.s1
-   {
-      datum baseAddress
-      {
-         value = "32";
-         type = "String";
-      }
-   }
    element clk_0
    {
       datum _sortIndex
@@ -61,7 +29,7 @@
    {
       datum _sortIndex
       {
-         value = "8";
+         value = "6";
          type = "int";
       }
    }
@@ -69,7 +37,7 @@
    {
       datum baseAddress
       {
-         value = "168";
+         value = "176";
          type = "String";
       }
    }
@@ -77,7 +45,7 @@
    {
       datum _sortIndex
       {
-         value = "9";
+         value = "7";
          type = "int";
       }
    }
@@ -130,7 +98,7 @@
    {
       datum _sortIndex
       {
-         value = "10";
+         value = "8";
          type = "int";
       }
    }
@@ -146,7 +114,7 @@
    {
       datum _sortIndex
       {
-         value = "14";
+         value = "12";
          type = "int";
       }
    }
@@ -162,7 +130,7 @@
    {
       datum _sortIndex
       {
-         value = "11";
+         value = "9";
          type = "int";
       }
    }
@@ -178,7 +146,7 @@
    {
       datum _sortIndex
       {
-         value = "12";
+         value = "10";
          type = "int";
       }
    }
@@ -194,7 +162,7 @@
    {
       datum _sortIndex
       {
-         value = "15";
+         value = "13";
          type = "int";
       }
    }
@@ -210,7 +178,7 @@
    {
       datum _sortIndex
       {
-         value = "13";
+         value = "11";
          type = "int";
       }
    }
@@ -266,7 +234,7 @@
    {
       datum baseAddress
       {
-         value = "176";
+         value = "168";
          type = "String";
       }
    }
@@ -284,15 +252,13 @@
  <parameter name="hideFromIPCatalog" value="false" />
  <parameter name="lockedInterfaceDefinition" value="" />
  <parameter name="maxAdditionalLatency" value="1" />
- <parameter name="projectName">usb-vga-inteface.qpf</parameter>
+ <parameter name="projectName">faculty_fighters.qpf</parameter>
  <parameter name="sopcBorderPoints" value="false" />
  <parameter name="systemHash" value="0" />
  <parameter name="testBenchDutName" value="" />
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
- <interface name="accumulator" internal="accumulator.external_connection" />
- <interface name="clear" internal="clear.external_connection" />
  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
  <interface
    name="keycode"
@@ -332,38 +298,6 @@
  <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
  <interface name="sdram_clk" internal="sdram_pll.c1" type="clock" dir="start" />
  <interface name="sdram_wire" internal="sdram.wire" type="conduit" dir="end" />
- <module
-   name="accumulator"
-   kind="altera_avalon_pio"
-   version="15.0"
-   enabled="0">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="50000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="1" />
- </module>
- <module name="clear" kind="altera_avalon_pio" version="15.0" enabled="0">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="50000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="1" />
- </module>
  <module name="clk_0" kind="clock_source" version="15.0" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
@@ -427,7 +361,7 @@
   <parameter name="dataAddrWidth" value="29" />
   <parameter name="dataMasterHighPerformanceAddrWidth" value="1" />
   <parameter name="dataMasterHighPerformanceMapParam" value="" />
-  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x10' /><slave name='otg_hpi_reset.s1' start='0x20' end='0x30' /><slave name='otg_hpi_cs.s1' start='0x30' end='0x40' /><slave name='otg_hpi_w.s1' start='0x40' end='0x50' /><slave name='otg_hpi_r.s1' start='0x50' end='0x60' /><slave name='otg_hpi_data.s1' start='0x60' end='0x70' /><slave name='otg_hpi_address.s1' start='0x70' end='0x80' /><slave name='keycode.s1' start='0x80' end='0x90' /><slave name='sdram_pll.pll_slave' start='0x90' end='0xA0' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0xA8' end='0xB0' /><slave name='sysid_qsys_0.control_slave' start='0xB0' end='0xB8' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x1000' end='0x1800' /><slave name='sdram.s1' start='0x10000000' end='0x18000000' /></address-map>]]></parameter>
+  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x10' /><slave name='otg_hpi_reset.s1' start='0x20' end='0x30' /><slave name='otg_hpi_cs.s1' start='0x30' end='0x40' /><slave name='otg_hpi_w.s1' start='0x40' end='0x50' /><slave name='otg_hpi_r.s1' start='0x50' end='0x60' /><slave name='otg_hpi_data.s1' start='0x60' end='0x70' /><slave name='otg_hpi_address.s1' start='0x70' end='0x80' /><slave name='keycode.s1' start='0x80' end='0x90' /><slave name='sdram_pll.pll_slave' start='0x90' end='0xA0' /><slave name='sysid_qsys_0.control_slave' start='0xA8' end='0xB0' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0xB0' end='0xB8' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x1000' end='0x1800' /><slave name='sdram.s1' start='0x10000000' end='0x18000000' /></address-map>]]></parameter>
   <parameter name="data_master_high_performance_paddr_base" value="0" />
   <parameter name="data_master_high_performance_paddr_size" value="0" />
   <parameter name="data_master_paddr_base" value="0" />
@@ -466,7 +400,7 @@
   <parameter name="icache_tagramBlockType" value="Automatic" />
   <parameter name="impl" value="Tiny" />
   <parameter name="instAddrWidth" value="29" />
-  <parameter name="instSlaveMapParam"><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x10' /><slave name='sdram_pll.pll_slave' start='0x90' end='0xA0' /><slave name='sysid_qsys_0.control_slave' start='0xB0' end='0xB8' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x1000' end='0x1800' /><slave name='sdram.s1' start='0x10000000' end='0x18000000' /></address-map>]]></parameter>
+  <parameter name="instSlaveMapParam"><![CDATA[<address-map><slave name='onchip_memory2_0.s1' start='0x0' end='0x10' /><slave name='sdram_pll.pll_slave' start='0x90' end='0xA0' /><slave name='sysid_qsys_0.control_slave' start='0xA8' end='0xB0' /><slave name='nios2_gen2_0.debug_mem_slave' start='0x1000' end='0x1800' /><slave name='sdram.s1' start='0x10000000' end='0x18000000' /></address-map>]]></parameter>
   <parameter name="instructionMasterHighPerformanceAddrWidth" value="1" />
   <parameter name="instructionMasterHighPerformanceMapParam" value="" />
   <parameter name="instruction_master_high_performance_paddr_base" value="0" />
@@ -918,7 +852,7 @@
    start="nios2_gen2_0.data_master"
    end="jtag_uart_0.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x00a8" />
+  <parameter name="baseAddress" value="0x00b0" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -927,7 +861,7 @@
    start="nios2_gen2_0.data_master"
    end="sysid_qsys_0.control_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x00b0" />
+  <parameter name="baseAddress" value="0x00a8" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -964,24 +898,6 @@
    end="onchip_memory2_0.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="15.0"
-   start="nios2_gen2_0.data_master"
-   end="clear.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0020" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="15.0"
-   start="nios2_gen2_0.data_master"
-   end="accumulator.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0030" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1053,7 +969,7 @@
    start="nios2_gen2_0.instruction_master"
    end="sysid_qsys_0.control_slave">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x00b0" />
+  <parameter name="baseAddress" value="0x00a8" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1095,9 +1011,7 @@
  <connection kind="clock" version="15.0" start="sdram_pll.c0" end="sdram.clk" />
  <connection kind="clock" version="15.0" start="clk_0.clk" end="nios2_gen2_0.clk" />
  <connection kind="clock" version="15.0" start="clk_0.clk" end="sysid_qsys_0.clk" />
- <connection kind="clock" version="15.0" start="clk_0.clk" end="clear.clk" />
  <connection kind="clock" version="15.0" start="clk_0.clk" end="jtag_uart_0.clk" />
- <connection kind="clock" version="15.0" start="clk_0.clk" end="accumulator.clk" />
  <connection kind="clock" version="15.0" start="clk_0.clk" end="keycode.clk" />
  <connection
    kind="clock"
@@ -1142,17 +1056,11 @@
    version="15.0"
    start="clk_0.clk_reset"
    end="sysid_qsys_0.reset" />
- <connection kind="reset" version="15.0" start="clk_0.clk_reset" end="clear.reset" />
  <connection
    kind="reset"
    version="15.0"
    start="clk_0.clk_reset"
    end="jtag_uart_0.reset" />
- <connection
-   kind="reset"
-   version="15.0"
-   start="clk_0.clk_reset"
-   end="accumulator.reset" />
  <connection
    kind="reset"
    version="15.0"
