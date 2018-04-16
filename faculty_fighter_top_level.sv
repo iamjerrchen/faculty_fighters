@@ -41,6 +41,7 @@ module faculty_fighter_top_level(
     assign Clk = CLOCK_50;
     always_ff @ (posedge Clk) begin
         Reset_h <= ~(KEY[0]);        // The push buttons are active low
+		  Soft_Reset <= ~(KEY[3]);
     end
     
     logic [1:0] hpi_addr;
@@ -94,12 +95,10 @@ module faculty_fighter_top_level(
     
     // Use PLL to generate the 25MHZ VGA_CLK.
     // You will have to generate it on your own in simulation.
-    //vga_clk vga_clk_instance(.inclk0(Clk), .c0(VGA_CLK));
+    vga_clk vga_clk_instance(.inclk0(Clk), .c0(VGA_CLK));
     
-	 //logic [9:0] DrawX, DrawY;
-	 //logic is_ball;
-    // TODO: Fill in the connections for the rest of the modules 
-    /*VGA_controller vga_controller_instance(.Clk(Clk),
+	 logic [9:0] DrawX, DrawY;
+    VGA_controller vga_controller_instance(.Clk(Clk),
 														.Reset(Reset_h),
 														.VGA_HS(VGA_HS),
 														.VGA_VS(VGA_VS),
@@ -107,23 +106,68 @@ module faculty_fighter_top_level(
 														.VGA_BLANK_N(VGA_BLANK_N),
 														.VGA_SYNC_N(VGA_SYNC_N),
 														.DrawX(DrawX),
-														.DrawY(DrawY));*/
+														.DrawY(DrawY));
     
+	 
+	 ////////// ADD STUFF HERE ///////////
+	 
+	 logic is_ball1; 
+	 logic is_ball2;
+	 
+	 // parameter means, values can't be changed at runtime
+	 parameter X_Center1 = 10'd280;
+	 parameter Y_Center1 = 10'd375;
+	 parameter X_Center2 = 10'd360;
+	 parameter Y_Center2 = 10'd375;
+	 
+	 logic [9:0] Player_X_Size, NPC_X_Size;
+	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr;
     // Which signal should be frame_clk?
-    /*ball ball_instance(.Clk(Clk),
+    player player_instance(.Clk(Clk),
 								.Reset(Reset_h),
+								.Soft_Reset(Soft_Reset),
 								.frame_clk(VGA_VS),
+								.Ball_X_Center(X_Center1),
+								.Ball_Y_Center(Y_Center1),
+								// prevent overlapping
+								.Player_X_Curr_Pos(Player_X_curr),
+								.Player_Y_Curr_Pos(Player_Y_curr),
+								.Player_X_Size(Player_X_Size),
+								.Enemy_X_Curr_Pos(NPC_X_curr),
+								.Enemy_Y_Curr_Pos(NPC_Y_curr),
+								.Enemy_X_Size(NPC_X_Size),
+								
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
-								.is_ball(is_ball));*/
+								.is_ball(is_ball1));
+								
+	 npc npc_instance(.Clk(Clk),
+								.Reset(Reset_h),
+								.Soft_Reset(Soft_Reset),
+								.frame_clk(VGA_VS),
+								.Ball_X_Center(X_Center2),
+								.Ball_Y_Center(Y_Center2),
+								// prevent overlapping
+								.NPC_X_Curr_Pos(NPC_X_curr),
+								.NPC_Y_Curr_Pos(NPC_Y_curr),
+								.NPC_X_Size(NPC_X_Size),
+								.Enemy_X_Curr_Pos(Player_X_curr),
+								.Enemy_Y_Curr_Pos(Player_Y_curr),
+								.Enemy_X_Size(Player_X_Size),
+								
+								.keycode(keycode),
+								.DrawX(DrawX),
+								.DrawY(DrawY),
+								.is_ball(is_ball2));
     
-    /*color_mapper color_instance(.is_ball(is_ball),
+    color_mapper color_instance(.is_ball1(is_ball1),
+											.is_ball2(is_ball2),
 											.DrawX(DrawX),
 											.DrawY(DrawY),
 											.VGA_R(VGA_R),
 											.VGA_G(VGA_G),
-											.VGA_B(VGA_B));*/
+											.VGA_B(VGA_B));
     
     // Display keycode on hex display
     HexDriver hex_inst_0 (keycode[3:0], HEX0);
