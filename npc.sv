@@ -1,6 +1,5 @@
 module  npc ( input         Clk,                // 50 MHz clock
                              Reset,              // Active-high reset signal
-									  Soft_Reset,
                              frame_clk,          // The clock indicating a new frame (~60Hz)
 					input [9:0]	  Ball_X_Center,
 									  Ball_Y_Center,
@@ -8,8 +7,10 @@ module  npc ( input         Clk,                // 50 MHz clock
 					output logic [9:0] NPC_X_Curr_Pos, NPC_Y_Curr_Pos, // Outputting NPC current pos
 				   input [9:0]	  Enemy_X_Curr_Pos,
 									  Enemy_Y_Curr_Pos,
-					output logic [9:0] Enemy_X_Size,
-											 NPC_X_Size,
+					input [9:0]   Enemy_X_Size,	// output logic -> input
+					output logic [9:0] NPC_X_Size,
+											 
+					input 		  Up, Left, Right,
 					
 					input [7:0]	  keycode,				 // keycode exported form qsys
                input [9:0]   DrawX, DrawY,       // Current pixel coordinates
@@ -39,7 +40,7 @@ module  npc ( input         Clk,                // 50 MHz clock
     // Update registers
     always_ff @ (posedge Clk)
     begin
-        if (Reset || Soft_Reset)
+        if (Reset)
         begin
             Ball_X_Pos <= Ball_X_Center;
             Ball_Y_Pos <= Ball_Y_Center;
@@ -77,14 +78,14 @@ module  npc ( input         Clk,                // 50 MHz clock
         if (frame_clk_rising_edge)
         begin
 				// Keypress logic
-				if(keycode == 8'h52) // W (up)
+				if(Up)//keycode == 8'h52) // W (up)
 					begin
 						Ball_X_Incr_in = 1'b0;//Ball_X_Pos;
 						Ball_Y_Incr_in = 1'b0;//Ball_Y_Pos - 1'b1;
 						//Ball_X_Motion_in = 10'b0;
 						Ball_Y_Motion_in = ~(Ball_Y_Step) + 1'b1;
 					end
-				else if(keycode == 8'h50) // A (left)
+				else if(Left)//keycode == 8'h50) // A (left)
 					begin
 						Ball_X_Incr_in = ~(Ball_X_Step) + 1'b1;
 						Ball_Y_Incr_in = 1'b0;//Ball_Y_Pos;
@@ -98,7 +99,7 @@ module  npc ( input         Clk,                // 50 MHz clock
 						//Ball_X_Motion_in = 10'b0;
 						//Ball_Y_Motion_in = Ball_Y_Step;
 					end
-				else if(keycode == 8'h4f) // D (right)
+				else if(Right)//keycode == 8'h4f) // D (right)
 					begin
 						Ball_X_Incr_in = 1'b1;//Ball_X_Pos + 1'b1;
 						Ball_Y_Incr_in = 1'b0;//Ball_Y_Pos;

@@ -1,6 +1,7 @@
 module faculty_fighter_top_level(
 											input	CLOCK_50,
 											input        [3:0]  	KEY,          //bit 0 is set up as Reset
+											input			 [15:0]	SW,			  //switches
 											output logic [6:0]  	HEX0, HEX1,
 											
 											// VGA Interface 
@@ -113,6 +114,7 @@ module faculty_fighter_top_level(
 	 
 	 logic is_ball1; 
 	 logic is_ball2;
+	 logic is_proj;
 	 
 	 // parameter means, values can't be changed at runtime
 	 parameter X_Center1 = 10'd280;
@@ -122,10 +124,28 @@ module faculty_fighter_top_level(
 	 
 	 logic [9:0] Player_X_Size, NPC_X_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr;
+	 
+	 // projectile belongs to player
+	 projectile bullet(.Clk(Clk),
+							.Reset(Reset_h || Soft_Reset),
+							.frame_clk(VGA_VS),
+							.Proj_X_Center(Player_X_curr),		// Shooter's Center
+							.Proj_Y_Center(Player_Y_curr),		
+							.SHOOT(~KEY[2]),
+							.Proj_X_Step(10'd4),
+					
+							.Target_X_Curr_Pos(NPC_X_curr),
+							.Target_Y_Curr_Pos(NPC_Y_curr),
+							.Enemy_X_Size(NPC_X_Size),
+	
+							.DrawX(DrawX),
+							.DrawY(DrawY),		// Current pixel coordinates
+							.is_proj(is_proj)			// Whether pixel belongs to projectile or other
+							);
+												
     // Which signal should be frame_clk?
     player player_instance(.Clk(Clk),
-								.Reset(Reset_h),
-								.Soft_Reset(Soft_Reset),
+								.Reset(Reset_h || Soft_Reset),
 								.frame_clk(VGA_VS),
 								.Ball_X_Center(X_Center1),
 								.Ball_Y_Center(Y_Center1),
@@ -137,14 +157,17 @@ module faculty_fighter_top_level(
 								.Enemy_Y_Curr_Pos(NPC_Y_curr),
 								.Enemy_X_Size(NPC_X_Size),
 								
+								.Up(SW[13]),
+								.Left(SW[15]),
+								.Right(SW[14]),
+								
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
 								.is_ball(is_ball1));
 								
 	 npc npc_instance(.Clk(Clk),
-								.Reset(Reset_h),
-								.Soft_Reset(Soft_Reset),
+								.Reset(Reset_h || Soft_Reset),
 								.frame_clk(VGA_VS),
 								.Ball_X_Center(X_Center2),
 								.Ball_Y_Center(Y_Center2),
@@ -156,6 +179,11 @@ module faculty_fighter_top_level(
 								.Enemy_Y_Curr_Pos(Player_Y_curr),
 								.Enemy_X_Size(Player_X_Size),
 								
+								.Up(~KEY[1]),
+								.Left(SW[1]),
+								.Right(SW[0]),
+								
+								
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
@@ -163,6 +191,7 @@ module faculty_fighter_top_level(
     
     color_mapper color_instance(.is_ball1(is_ball1),
 											.is_ball2(is_ball2),
+											.is_proj(is_proj),
 											.DrawX(DrawX),
 											.DrawY(DrawY),
 											.VGA_R(VGA_R),

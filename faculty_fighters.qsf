@@ -52,15 +52,6 @@ set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (SystemVerilog)
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_id eda_simulation
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name SDC_FILE sys_clk.sdc
-set_global_assignment -name QIP_FILE faculty_fighter_soc/synthesis/faculty_fighter_soc.qip
-set_global_assignment -name SYSTEMVERILOG_FILE VGA_controller.sv
-set_global_assignment -name QIP_FILE vga_clk.qip
-set_global_assignment -name SYSTEMVERILOG_FILE Color_Mapper.sv
-set_global_assignment -name SYSTEMVERILOG_FILE hpi_io_intf.sv
-set_global_assignment -name SYSTEMVERILOG_FILE faculty_fighter_top_level.sv
-set_global_assignment -name QIP_FILE faculty_fighters/synthesis/faculty_fighters.qip
-set_global_assignment -name SYSTEMVERILOG_FILE HexDriver.sv
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
@@ -596,6 +587,16 @@ set_global_assignment -name PARTITION_COLOR 16764057 -entity lab8 -section_id To
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -entity lab8 -section_id Top
 set_global_assignment -name FLOW_ENABLE_POWER_ANALYZER ON
 set_global_assignment -name POWER_DEFAULT_INPUT_IO_TOGGLE_RATE "12.5 %"
+set_global_assignment -name SDC_FILE sys_clk.sdc
+set_global_assignment -name QIP_FILE faculty_fighter_soc/synthesis/faculty_fighter_soc.qip
+set_global_assignment -name SYSTEMVERILOG_FILE VGA_controller.sv
+set_global_assignment -name QIP_FILE vga_clk.qip
+set_global_assignment -name SYSTEMVERILOG_FILE Color_Mapper.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hpi_io_intf.sv
+set_global_assignment -name SYSTEMVERILOG_FILE faculty_fighter_top_level.sv
+set_global_assignment -name QIP_FILE faculty_fighters/synthesis/faculty_fighters.qip
+set_global_assignment -name SYSTEMVERILOG_FILE HexDriver.sv
 set_global_assignment -name SYSTEMVERILOG_FILE player.sv
 set_global_assignment -name SYSTEMVERILOG_FILE npc.sv
+set_global_assignment -name SYSTEMVERILOG_FILE projectile.sv
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

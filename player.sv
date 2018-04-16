@@ -1,6 +1,5 @@
 module  player ( input       Clk,                // 50 MHz clock
                              Reset,              // Active-high reset signal
-									  Soft_Reset,
                              frame_clk,          // The clock indicating a new frame (~60Hz)
 					input [9:0]	  Ball_X_Center,
 									  Ball_Y_Center,
@@ -8,8 +7,10 @@ module  player ( input       Clk,                // 50 MHz clock
 					output logic [9:0] Player_X_Curr_Pos, Player_Y_Curr_Pos, // Outputting Player current pos
 					input [9:0]	  Enemy_X_Curr_Pos,
 									  Enemy_Y_Curr_Pos,
-					output logic [9:0] Enemy_X_Size,
-											 Player_X_Size,
+					input [9:0] Enemy_X_Size,
+					output logic [9:0] Player_X_Size,
+											 
+					input			  Up, Left, Right,
 					
 					input [7:0]	  keycode,				 // keycode exported form qsys
                input [9:0]   DrawX, DrawY,       // Current pixel coordinates
@@ -37,7 +38,7 @@ module  player ( input       Clk,                // 50 MHz clock
     // Update registers
     always_ff @ (posedge Clk)
     begin
-        if (Reset || Soft_Reset)
+        if (Reset)
         begin
             Ball_X_Pos <= Ball_X_Center;
             Ball_Y_Pos <= Ball_Y_Center;
@@ -69,13 +70,13 @@ module  player ( input       Clk,                // 50 MHz clock
         if (frame_clk_rising_edge)
         begin
 				// Keypress logic
-				if(keycode == 8'd26) // W (up)
+				if(Up)//keycode == 8'd26) // W (up)
 					begin
 						//Ball_X_Pos_in = Ball_X_Pos;
 						//Ball_Y_Pos_in = Ball_Y_Pos - 1'b1;
 						Ball_Y_Motion_in = ~(Ball_Y_Step) + 1'b1;
 					end
-				else if(keycode == 8'd4) // A (left)
+				else if(Left)//keycode == 8'd4) // A (left)
 					begin
 						Ball_X_Pos_in = Ball_X_Pos - 1'b1;
 						Ball_Y_Pos_in = Ball_Y_Pos;
@@ -89,7 +90,7 @@ module  player ( input       Clk,                // 50 MHz clock
 						//Ball_X_Motion_in = 10'b0;
 						//Ball_Y_Motion_in = Ball_Y_Step;
 					end
-				else if(keycode == 8'd7) // D (right)
+				else if(Right)//keycode == 8'd7) // D (right)
 					begin
 						Ball_X_Pos_in = Ball_X_Pos + 1'b1;
 						Ball_Y_Pos_in = Ball_Y_Pos;
