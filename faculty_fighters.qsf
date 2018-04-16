@@ -57,7 +57,6 @@ set_global_assignment -name QIP_FILE faculty_fighter_soc/synthesis/faculty_fight
 set_global_assignment -name SYSTEMVERILOG_FILE VGA_controller.sv
 set_global_assignment -name QIP_FILE vga_clk.qip
 set_global_assignment -name SYSTEMVERILOG_FILE Color_Mapper.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ball.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hpi_io_intf.sv
 set_global_assignment -name SYSTEMVERILOG_FILE faculty_fighter_top_level.sv
 set_global_assignment -name QIP_FILE faculty_fighters/synthesis/faculty_fighters.qip
@@ -597,4 +596,6 @@ set_global_assignment -name PARTITION_COLOR 16764057 -entity lab8 -section_id To
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -entity lab8 -section_id Top
 set_global_assignment -name FLOW_ENABLE_POWER_ANALYZER ON
 set_global_assignment -name POWER_DEFAULT_INPUT_IO_TOGGLE_RATE "12.5 %"
+set_global_assignment -name SYSTEMVERILOG_FILE player.sv
+set_global_assignment -name SYSTEMVERILOG_FILE npc.sv
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
