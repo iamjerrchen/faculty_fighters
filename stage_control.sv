@@ -13,7 +13,7 @@ module stage_control (
 							
 							// Logic signals
 							output logic 	start_l,
-												game_l,
+												battle_l,
 												win_l,
 												lose_l
 							);
@@ -58,7 +58,7 @@ module stage_control (
 				START: 
 					begin
 						start_l = 1'b1;
-						game_l = 1'b0;
+						battle_l = 1'b0;
 						win_l = 1'b0;
 						lose_l = 1'b0;
 					end
@@ -66,7 +66,7 @@ module stage_control (
 				WIN: 
 					begin
 						start_l = 1'b0;
-						game_l = 1'b0;
+						battle_l = 1'b0;
 						win_l = 1'b1;
 						lose_l = 1'b0;
 					end
@@ -74,7 +74,7 @@ module stage_control (
 				LOSE:
 					begin
 						start_l = 1'b0;
-						game_l = 1'b0;
+						battle_l = 1'b0;
 						win_l = 1'b0;
 						lose_l = 1'b1;
 					end
@@ -82,7 +82,7 @@ module stage_control (
 				default: // default in battle state
 					begin 
 						start_l = 1'b0;
-						game_l = 1'b1;
+						battle_l = 1'b1;
 						win_l = 1'b0;
 						lose_l = 1'b0;
 					end

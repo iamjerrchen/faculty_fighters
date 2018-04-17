@@ -145,18 +145,18 @@ module faculty_fighter_top_level(
 	 assign NPC_Dead = SW[9];
 	 
 	 // state output
-	 logic start_l, game_l, win_l, lose_l;
+	 logic start_l, battle_l, win_l, lose_l;
 	 
 	 stage_control stages(.Clk(VGA_VS), // update state based on frame? or Clk
 								.Reset(Reset_h),
 								
 								.Fight(Soft_Reset_h),
 								.Restart(Restart),
-								.Player_Dead(Player_Dead),//1'b0),
-								.NPC_Dead(NPC_Dead),//1'b0),
+								.Player_Dead(Player_Dead),
+								.NPC_Dead(NPC_Dead),
 								
 								.start_l(start_l),
-								.game_l(game_l),
+								.battle_l(battle_l),
 								.win_l(win_l),
 								.lose_l(lose_l)
 								);
@@ -165,7 +165,7 @@ module faculty_fighter_top_level(
 	 projectile bullet(.Clk(Clk),
 							.Reset(Reset_h || Soft_Reset_h),
 							.frame_clk(VGA_VS),
-							.Proj_X_Center(Player_X_curr),		// Shooter's Center
+							.Proj_X_Center(Player_X_curr), // Shooter's Center
 							.Proj_Y_Center(Player_Y_curr),		
 							.SHOOT(Shoot_h),
 							.Proj_X_Step(10'd2),
@@ -229,7 +229,7 @@ module faculty_fighter_top_level(
 											.is_proj(is_proj),
 											// stage
 											.start_l(start_l),
-											.game_l(game_l),
+											.battle_l(battle_l),
 											.win_l(win_l),
 											.lose_l(lose_l),
 											
