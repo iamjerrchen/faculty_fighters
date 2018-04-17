@@ -1,17 +1,17 @@
-//Two-always example for state machine
-// This module is a state machine to control the stages in the game.
-// Start screen, game screen, and end screen.
+// Two-always state machine
+// This module controls the stages in the game.
+// Start screen, battle screen, and end screens.
 module stage_control (
-							input logic 	Clk,		// uses frame clk
-							input logic 	Reset,
+							input logic 	Clk,		// Frame Clock
+							input logic 	Reset,	// System Wide Reset
 							
-							// state change conditions, Active High
+							// State change conditions, Active High
 							input logic 	Fight,
 												Restart,
 												Player_Dead,
 												NPC_Dead,
 							
-							// logic signals
+							// Logic signals
 							output logic 	start_l,
 												game_l,
 												win_l,
@@ -19,14 +19,12 @@ module stage_control (
 							);
 
 	// Declare signals curr_state, next_state of type enum
-	// with enum values of A, B, ..., F as the state values
-	// Note that the length implies a max of 8 states, so you will need to bump this up for 8-bits
-	enum logic [2:0] {START, GAME, WIN, LOSE, END}	curr_state, next_state; 
+	enum logic [1:0] {START, BATTLE, WIN, LOSE}	curr_state, next_state; 
 
-	//updates flip flop, current state is the only one
+	// Updates flip flop, current state is the only one
 	always_ff @ (posedge Clk)  
 	begin
-		if(Restart)
+		if(Restart || Reset)
 			curr_state <= START;
 		else 
 			curr_state <= next_state;
@@ -36,17 +34,17 @@ module stage_control (
 	always_comb
 		begin
 		
-			next_state = curr_state;	//required because I haven't enumerated all possibilities below
+			next_state = curr_state;
 			unique case (curr_state) 
 			
-				START:	if(Fight)// Clear A, Load B bit is on
-								next_state = GAME;
-				GAME:		if(NPC_Dead)
+				START:	if(Fight)
+								next_state = BATTLE;
+				BATTLE:		if(NPC_Dead)
 								next_state = WIN;
 							else if(Player_Dead)
 								next_state = LOSE;
 								
-				// stay in state til released
+				// Stay in state til released
 				WIN:		if(~NPC_Dead)
 								next_state = START;
 				LOSE:		if(~Player_Dead)
@@ -81,7 +79,7 @@ module stage_control (
 						lose_l = 1'b1;
 					end
 					
-				default: // default in game state
+				default: // default in battle state
 					begin 
 						start_l = 1'b0;
 						game_l = 1'b1;
