@@ -39,10 +39,14 @@ module faculty_fighter_top_level(
     logic Reset_h, Clk;
     logic [7:0] keycode;
     
+	 // synchronizer
     assign Clk = CLOCK_50;
     always_ff @ (posedge Clk) begin
         Reset_h <= ~(KEY[0]);        // The push buttons are active low
-		  Soft_Reset <= ~(KEY[3]);
+		  Soft_Reset_h <= ~(KEY[3]);
+		  // temporary
+		  Shoot_h <= ~(KEY[2]);
+		  NPC_Up_h <= ~(KEY[1]);
     end
     
     logic [1:0] hpi_addr;
@@ -112,11 +116,11 @@ module faculty_fighter_top_level(
 	 
 	 ////////// ADD STUFF HERE ///////////
 	 
-	 logic is_ball1; 
-	 logic is_ball2;
+	 logic is_player; 
+	 logic is_npc;
 	 logic is_proj;
 	 
-	 // parameter means, values can't be changed at runtime
+	 // constants for characters
 	 parameter X_Center1 = 10'd280;
 	 parameter Y_Center1 = 10'd375;
 	 parameter X_Center2 = 10'd360;
@@ -125,14 +129,46 @@ module faculty_fighter_top_level(
 	 logic [9:0] Player_X_Size, NPC_X_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr;
 	 
+	 // Input Control
+	 logic Player_Up, Player_Right, Player_Left, NPC_Right, NPC_Left;
+	 logic Restart;
+	 assign Player_Up = SW[13];
+	 assign Player_Right = SW[14];
+	 assign Player_Left = SW[15];
+	 assign NPC_Right = SW[0];
+	 assign NPC_Left = SW[1];
+	 assign Restart = SW[11];
+	 
+	 // temporary
+	 logic Player_Dead, NPC_Dead;
+	 assign Player_Dead = SW[10];
+	 assign NPC_Dead = SW[9];
+	 
+	 // state output
+	 logic start_l, game_l, win_l, lose_l;
+	 
+	 stage_control stages(.Clk(VGA_VS), // update state based on frame? or Clk
+								.Reset(Reset_h),
+								
+								.Fight(Soft_Reset_h),
+								.Restart(Restart),
+								.Player_Dead(Player_Dead),//1'b0),
+								.NPC_Dead(NPC_Dead),//1'b0),
+								
+								.start_l(start_l),
+								.game_l(game_l),
+								.win_l(win_l),
+								.lose_l(lose_l)
+								);
+	 
 	 // projectile belongs to player
 	 projectile bullet(.Clk(Clk),
-							.Reset(Reset_h || Soft_Reset),
+							.Reset(Reset_h || Soft_Reset_h),
 							.frame_clk(VGA_VS),
 							.Proj_X_Center(Player_X_curr),		// Shooter's Center
 							.Proj_Y_Center(Player_Y_curr),		
-							.SHOOT(~KEY[2]),
-							.Proj_X_Step(10'd4),
+							.SHOOT(Shoot_h),
+							.Proj_X_Step(10'd2),
 					
 							.Target_X_Curr_Pos(NPC_X_curr),
 							.Target_Y_Curr_Pos(NPC_Y_curr),
@@ -145,7 +181,7 @@ module faculty_fighter_top_level(
 												
     // Which signal should be frame_clk?
     player player_instance(.Clk(Clk),
-								.Reset(Reset_h || Soft_Reset),
+								.Reset(Reset_h || Soft_Reset_h),
 								.frame_clk(VGA_VS),
 								.Ball_X_Center(X_Center1),
 								.Ball_Y_Center(Y_Center1),
@@ -157,17 +193,17 @@ module faculty_fighter_top_level(
 								.Enemy_Y_Curr_Pos(NPC_Y_curr),
 								.Enemy_X_Size(NPC_X_Size),
 								
-								.Up(SW[13]),
-								.Left(SW[15]),
-								.Right(SW[14]),
+								.Up(Player_Up),
+								.Left(Player_Left),
+								.Right(Player_Right),
 								
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
-								.is_ball(is_ball1));
+								.is_ball(is_player));
 								
 	 npc npc_instance(.Clk(Clk),
-								.Reset(Reset_h || Soft_Reset),
+								.Reset(Reset_h || Soft_Reset_h),
 								.frame_clk(VGA_VS),
 								.Ball_X_Center(X_Center2),
 								.Ball_Y_Center(Y_Center2),
@@ -179,19 +215,24 @@ module faculty_fighter_top_level(
 								.Enemy_Y_Curr_Pos(Player_Y_curr),
 								.Enemy_X_Size(Player_X_Size),
 								
-								.Up(~KEY[1]),
-								.Left(SW[1]),
-								.Right(SW[0]),
-								
+								.Up(NPC_Up_h),
+								.Left(NPC_Left),
+								.Right(NPC_Right),
 								
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
-								.is_ball(is_ball2));
+								.is_ball(is_npc));
     
-    color_mapper color_instance(.is_ball1(is_ball1),
-											.is_ball2(is_ball2),
+    color_mapper color_instance(.is_ball1(is_player),
+											.is_ball2(is_npc),
 											.is_proj(is_proj),
+											// stage
+											.start_l(start_l),
+											.game_l(game_l),
+											.win_l(win_l),
+											.lose_l(lose_l),
+											
 											.DrawX(DrawX),
 											.DrawY(DrawY),
 											.VGA_R(VGA_R),
