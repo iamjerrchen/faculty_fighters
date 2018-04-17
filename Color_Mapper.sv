@@ -19,7 +19,7 @@ module  color_mapper ( input              is_ball1,            // Whether curren
 														is_proj,
 														// stage
 														start_l,
-														game_l,
+														battle_l,
 														win_l,
 														lose_l,
 														
