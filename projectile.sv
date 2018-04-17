@@ -2,17 +2,15 @@ module projectile(input				Clk,
 											Reset,
 											frame_clk,
 						input [9:0]		Proj_X_Center,		// Shooter's Center
-											Proj_Y_Center,		
+											Proj_Y_Center,
+											Proj_X_Step,
 											
-						input				SHOOT,
-						input	[9:0]		Proj_X_Step,
-										
-						input [9:0] 	Target_X_Curr_Pos, Target_Y_Curr_Pos,
-						input [9:0]		Enemy_X_Size,
+						output logic [9:0]	Proj_X_Curr_Pos,
+													Proj_Y_Curr_Pos,
+
+						input				activate, contact,			// 
 						
 						input	[9:0]		DrawX, DrawY,		// Current pixel coordinates
-						
-						
 						output logic	is_proj				// Whether pixel belongs to projectile or other
 						);
 						
@@ -27,6 +25,9 @@ module projectile(input				Clk,
 	logic [9:0] Proj_X_Pos, Proj_X_Motion, Proj_Y_Pos;
 	logic [9:0] Proj_X_Pos_in, Proj_X_Motion_in, Proj_Y_Pos_in;
 	logic 		is_active, is_active_in;
+	
+	assign Proj_X_Curr_Pos = Proj_X_Pos;
+	assign Proj_Y_Curr_Pos = Proj_Y_Pos;
     
     //////// Do not modify the always_ff blocks. ////////
     // Detect rising edge of frame_clk
@@ -77,13 +78,14 @@ module projectile(input				Clk,
         // Update position and motion only at rising edge of frame clock
         if (frame_clk_rising_edge)
         begin
-				if(SHOOT)
+				if(activate)
 					begin
 						Proj_X_Motion_in = Proj_X_Step;
 						is_active_in = 1'b1;
 					end
 					
- 				if ( Proj_X_Pos >= Target_X_Curr_Pos)//Proj_X_Max)
+				// contact with target
+ 				if (contact || (Proj_X_Pos >= Proj_X_Max + Proj_Size))
 					begin
 						// Stay fixed to shooter
 						is_active_in = 1'd0;
@@ -97,9 +99,7 @@ module projectile(input				Clk,
         end
     end
     
-    // Compute whether the pixel corresponds to ball or background
-    /* Since the multiplicants are required to be signed, we have to first cast them
-       from logic to int (signed by default) before they are multiplied. */
+	 // Logic for mapping proj to screen
     int DistX, DistY, Size;
     assign DistX = DrawX - Proj_X_Pos;
     assign DistY = DrawY - Proj_Y_Pos;
@@ -114,8 +114,5 @@ module projectile(input				Clk,
 				end
 			else
             is_proj = 1'b0;
-        /* The ball's (pixelated) circle is generated using the standard circle formula.  Note that while 
-           the single line is quite powerful descriptively, it causes the synthesis tool to use up three
-           of the 12 available multipliers on the chip! */
     end					
 endmodule

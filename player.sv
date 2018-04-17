@@ -29,6 +29,8 @@ module  player ( input       Clk,                // 50 MHz clock
     logic [9:0] Ball_X_Pos_in, Ball_X_Motion_in, Ball_Y_Pos_in, Ball_Y_Motion_in;
 	 
 	 assign Player_X_Size = Ball_Size;
+	assign Player_X_Curr_Pos = Ball_X_Pos;
+	assign Player_Y_Curr_Pos = Ball_Y_Pos;
     
     //////// Do not modify the always_ff blocks. ////////
     // Detect rising edge of frame_clk
@@ -51,8 +53,6 @@ module  player ( input       Clk,                // 50 MHz clock
         begin
             Ball_X_Pos <= Ball_X_Pos_in;
             Ball_Y_Pos <= Ball_Y_Pos_in;
-				Player_X_Curr_Pos <= Ball_X_Pos_in;
-				Player_Y_Curr_Pos <= Ball_Y_Pos_in;
             Ball_X_Motion <= Ball_X_Motion_in;
             Ball_Y_Motion <= Ball_Y_Motion_in;
         end

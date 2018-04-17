@@ -116,9 +116,8 @@ module faculty_fighter_top_level(
 	 
 	 ////////// ADD STUFF HERE ///////////
 	 
-	 logic is_player; 
-	 logic is_npc;
-	 logic is_proj;
+	 logic is_player, is_npc, is_proj;
+	 logic bullet_contact;
 	 
 	 // constants for characters
 	 parameter X_Center1 = 10'd280;
@@ -127,7 +126,7 @@ module faculty_fighter_top_level(
 	 parameter Y_Center2 = 10'd375;
 	 
 	 logic [9:0] Player_X_Size, NPC_X_Size;
-	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr;
+	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr, Proj_X_curr, Proj_Y_curr;
 	 
 	 // Input Control
 	 logic Player_Up, Player_Right, Player_Left, NPC_Right, NPC_Left;
@@ -166,18 +165,25 @@ module faculty_fighter_top_level(
 							.Reset(Reset_h || Soft_Reset_h),
 							.frame_clk(VGA_VS),
 							.Proj_X_Center(Player_X_curr), // Shooter's Center
-							.Proj_Y_Center(Player_Y_curr),		
-							.SHOOT(Shoot_h),
-							.Proj_X_Step(10'd2),
-					
-							.Target_X_Curr_Pos(NPC_X_curr),
-							.Target_Y_Curr_Pos(NPC_Y_curr),
-							.Enemy_X_Size(NPC_X_Size),
-	
+							.Proj_Y_Center(Player_Y_curr),
+							.Proj_X_Step(10'd1),
+							
+							.Proj_X_Curr_Pos(Proj_X_curr),
+							.Proj_Y_Curr_Pos(Proj_Y_curr),
+							
+							.activate(Shoot_h),
+							.contact(bullet_contact),
 							.DrawX(DrawX),
 							.DrawY(DrawY),		// Current pixel coordinates
 							.is_proj(is_proj)			// Whether pixel belongs to projectile or other
 							);
+							
+	 hitbox bullet_npc(.Obj_X(Proj_X_curr),
+							.Obj_Y(Proj_Y_curr),
+							.Target_X(NPC_X_curr),
+							.Target_Y(NPC_X_curr),
+							.Coverage(NPC_X_Size),
+							.contact(bullet_contact));
 												
     // Which signal should be frame_clk?
     player player_instance(.Clk(Clk),
@@ -185,7 +191,7 @@ module faculty_fighter_top_level(
 								.frame_clk(VGA_VS),
 								.Ball_X_Center(X_Center1),
 								.Ball_Y_Center(Y_Center1),
-								// prevent overlapping
+								
 								.Player_X_Curr_Pos(Player_X_curr),
 								.Player_Y_Curr_Pos(Player_Y_curr),
 								.Player_X_Size(Player_X_Size),
@@ -207,7 +213,7 @@ module faculty_fighter_top_level(
 								.frame_clk(VGA_VS),
 								.Ball_X_Center(X_Center2),
 								.Ball_Y_Center(Y_Center2),
-								// prevent overlapping
+								
 								.NPC_X_Curr_Pos(NPC_X_curr),
 								.NPC_Y_Curr_Pos(NPC_Y_curr),
 								.NPC_X_Size(NPC_X_Size),
@@ -238,9 +244,13 @@ module faculty_fighter_top_level(
 											.VGA_R(VGA_R),
 											.VGA_G(VGA_G),
 											.VGA_B(VGA_B));
+											
+	
     
-    // Display keycode on hex display
-    HexDriver hex_inst_0 (keycode[3:0], HEX0);
-    HexDriver hex_inst_1 (keycode[7:4], HEX1);
+   // Display keycode on hex display
+   HexDriver hex_inst_0 (keycode[3:0], HEX0);
+   HexDriver hex_inst_1 (keycode[7:4], HEX1);
+	 
+	// debug counter
     
 endmodule
