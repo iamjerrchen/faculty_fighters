@@ -40,6 +40,7 @@ module  npc ( input         Clk,                // 50 MHz clock
         frame_clk_delayed <= frame_clk;
         frame_clk_rising_edge <= (frame_clk == 1'b1) && (frame_clk_delayed == 1'b0);
     end
+	 
     // Update registers
     always_ff @ (posedge Clk)
     begin
@@ -143,7 +144,7 @@ module  npc ( input         Clk,                // 50 MHz clock
 				else if ( Ball_X_Pos - Ball_Size <= Enemy_X_Curr_Pos + Enemy_X_Size) // Ball is at the left edge, STOP!
 					begin
 						//Ball_Y_Incr_in = 1'b0;
-						Ball_X_Incr_in = 1'b1;
+						Ball_X_Incr_in = Ball_X_Step;
 						//Ball_X_Motion_in = Ball_X_Step;
 						//Ball_Y_Motion_in = 10'b0;
 					end
@@ -166,9 +167,5 @@ module  npc ( input         Clk,                // 50 MHz clock
             is_ball = 1'b1;
         else
             is_ball = 1'b0;
-        /* The ball's (pixelated) circle is generated using the standard circle formula.  Note that while 
-           the single line is quite powerful descriptively, it causes the synthesis tool to use up three
-           of the 12 available multipliers on the chip! */
     end
-    
 endmodule

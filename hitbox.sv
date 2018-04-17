@@ -9,8 +9,8 @@ module hitbox(	input [9:0]		Obj_X,
 	/* Since the multiplicants are required to be signed, we have to first cast them
 	from logic to int (signed by default) before they are multiplied. */
 	int DistX, DistY, Size;
-	assign DistX = Obj_X - Target_Y;
-	assign DistY = Obj_Y - Target_Y;
+	assign DistX = Target_Y - Obj_X;
+	assign DistY = Target_Y - Obj_Y;
 	assign Size = Coverage;
 	always_comb begin
 		// function only works with circles/ovals

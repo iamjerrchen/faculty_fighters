@@ -121,9 +121,9 @@ module faculty_fighter_top_level(
 	 
 	 // constants for characters
 	 parameter X_Center1 = 10'd280;
-	 parameter Y_Center1 = 10'd375;
+	 parameter Y_Center1 = 10'd374;
 	 parameter X_Center2 = 10'd360;
-	 parameter Y_Center2 = 10'd375;
+	 parameter Y_Center2 = 10'd374;
 	 
 	 logic [9:0] Player_X_Size, NPC_X_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr, Proj_X_curr, Proj_Y_curr;
@@ -181,7 +181,7 @@ module faculty_fighter_top_level(
 	 hitbox bullet_npc(.Obj_X(Proj_X_curr),
 							.Obj_Y(Proj_Y_curr),
 							.Target_X(NPC_X_curr),
-							.Target_Y(NPC_X_curr),
+							.Target_Y(NPC_Y_curr),
 							.Coverage(NPC_X_Size),
 							.contact(bullet_contact));
 												

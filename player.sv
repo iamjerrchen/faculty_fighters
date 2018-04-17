@@ -1,20 +1,22 @@
-module  player ( input       Clk,                // 50 MHz clock
-                             Reset,              // Active-high reset signal
-                             frame_clk,          // The clock indicating a new frame (~60Hz)
-					input [9:0]	  Ball_X_Center,
-									  Ball_Y_Center,
-					// Prevent overlap logic
-					output logic [9:0] Player_X_Curr_Pos, Player_Y_Curr_Pos, // Outputting Player current pos
-					input [9:0]	  Enemy_X_Curr_Pos,
-									  Enemy_Y_Curr_Pos,
-					input [9:0] Enemy_X_Size,
-					output logic [9:0] Player_X_Size,
-											 
-					input			  Up, Left, Right,
+module  player (input					Clk,                // 50 MHz clock
+												Reset,              // Active-high reset signal
+												frame_clk,          // The clock indicating a new frame (~60Hz)
+					input [9:0]				Player_X_Center,
+												Player_Y_Center,
+												
+					input [9:0]	  			Enemy_X_Curr_Pos,
+												Enemy_Y_Curr_Pos,
+					input [9:0] 			Enemy_X_Size,
 					
-					input [7:0]	  keycode,				 // keycode exported form qsys
-               input [9:0]   DrawX, DrawY,       // Current pixel coordinates
-               output logic  is_ball             // Whether current pixel belongs to ball or background
+					output logic [9:0] 	Player_X_Curr_Pos,
+												Player_Y_Curr_Pos, // Outputting Player current pos
+												Player_X_Size,
+					
+					input						Up, Left, Right,
+					
+					input [7:0]				keycode,					// keycode exported form qsys
+					input [9:0]				DrawX, DrawY,			// Current pixel coordinates
+					output logic			is_ball					// Whether current pixel belongs to ball or background
               );
     
     parameter [9:0] Ball_X_Min = 10'd0;       // Leftmost point on the X axis
@@ -27,6 +29,7 @@ module  player ( input       Clk,                // 50 MHz clock
     
     logic [9:0] Ball_X_Pos, Ball_X_Motion, Ball_Y_Pos, Ball_Y_Motion;
     logic [9:0] Ball_X_Pos_in, Ball_X_Motion_in, Ball_Y_Pos_in, Ball_Y_Motion_in;
+	 logic [9:0] Ball_X_Incr, Ball_Y_Incr, Ball_X_Incr_in, Ball_Y_Incr_in;
 	 
 	 assign Player_X_Size = Ball_Size;
 	assign Player_X_Curr_Pos = Ball_X_Pos;
@@ -39,13 +42,17 @@ module  player ( input       Clk,                // 50 MHz clock
         frame_clk_delayed <= frame_clk;
         frame_clk_rising_edge <= (frame_clk == 1'b1) && (frame_clk_delayed == 1'b0);
     end
+	 //////// Do not modify the always_ff blocks. ////////
+	 
     // Update registers
     always_ff @ (posedge Clk)
     begin
         if (Reset)
         begin
-            Ball_X_Pos <= Ball_X_Center;
-            Ball_Y_Pos <= Ball_Y_Center;
+            Ball_X_Pos <= Player_X_Center;
+            Ball_Y_Pos <= Player_Y_Center;
+				Ball_X_Incr <= 10'd0;
+				Ball_Y_Incr <= 10'd0;
             Ball_X_Motion <= 10'd0;
             Ball_Y_Motion <= 10'd0; //Ball_Y_Step;
         end
@@ -53,18 +60,21 @@ module  player ( input       Clk,                // 50 MHz clock
         begin
             Ball_X_Pos <= Ball_X_Pos_in;
             Ball_Y_Pos <= Ball_Y_Pos_in;
+				Ball_X_Incr <= Ball_X_Incr_in;
+				Ball_Y_Incr <= Ball_Y_Incr_in;
             Ball_X_Motion <= Ball_X_Motion_in;
             Ball_Y_Motion <= Ball_Y_Motion_in;
         end
     end
-    //////// Do not modify the always_ff blocks. ////////
     
-    // You need to modify always_comb block.
+
     always_comb
     begin
         // By default, keep motion and position unchanged
         Ball_X_Pos_in = Ball_X_Pos;
         Ball_Y_Pos_in = Ball_Y_Pos;
+		  Ball_X_Incr_in = Ball_X_Incr;
+		  Ball_Y_Incr_in = Ball_Y_Incr;
         Ball_X_Motion_in = Ball_X_Motion;
         Ball_Y_Motion_in = Ball_Y_Motion;
         
@@ -74,30 +84,29 @@ module  player ( input       Clk,                // 50 MHz clock
 				// Keypress logic
 				if(Up)//keycode == 8'd26) // W (up)
 					begin
-						//Ball_X_Pos_in = Ball_X_Pos;
-						//Ball_Y_Pos_in = Ball_Y_Pos - 1'b1;
+						Ball_X_Incr_in = 1'b0;
+						Ball_Y_Incr_in = 1'b0;
 						Ball_Y_Motion_in = ~(Ball_Y_Step) + 1'b1;
 					end
 				else if(Left)//keycode == 8'd4) // A (left)
 					begin
-						Ball_X_Pos_in = Ball_X_Pos - 1'b1;
-						Ball_Y_Pos_in = Ball_Y_Pos;
-						//Ball_X_Motion_in = ~(Ball_X_Step) + 1'b1;
-						//Ball_Y_Motion_in = 10'b0;
+						Ball_X_Incr_in = ~(Ball_X_Step) + 1'b1;
+						Ball_Y_Incr_in = 1'b0;
 					end
 				else if(keycode == 8'd22) // S (down)
 					begin
-						Ball_X_Pos_in = Ball_X_Pos;
-						Ball_Y_Pos_in = Ball_Y_Pos + 1'b1;
-						//Ball_X_Motion_in = 10'b0;
-						//Ball_Y_Motion_in = Ball_Y_Step;
+						Ball_X_Incr_in = 1'b0;;
+						Ball_Y_Incr_in = 1'b0;
 					end
 				else if(Right)//keycode == 8'd7) // D (right)
 					begin
-						Ball_X_Pos_in = Ball_X_Pos + 1'b1;
-						Ball_Y_Pos_in = Ball_Y_Pos;
-						//Ball_X_Motion_in = Ball_X_Step;
-						//Ball_Y_Motion_in = 10'b0;
+						Ball_X_Incr_in = Ball_X_Step;
+						Ball_Y_Incr_in = 1'b0;;
+					end
+				else
+					begin
+						Ball_X_Incr_in = 1'b0;
+						Ball_Y_Incr_in = 1'b0;
 					end
 		  
             // Be careful when using comparators with "logic" datatype because compiler treats 
@@ -106,38 +115,25 @@ module  player ( input       Clk,                // 50 MHz clock
             // If Ball_Y_Pos is 0, then Ball_Y_Pos - Ball_Size will not be -4, but rather a large positive number.
             if( Ball_Y_Pos + Ball_Size >= Ball_Y_Max )  // Ball is at the bottom edge, BOUNCE!
 					begin
-						Ball_Y_Pos_in = Ball_Y_Pos - 1'b1;
-						Ball_X_Pos_in = Ball_X_Pos;
-						//Ball_X_Motion_in = 10'b0;
-						//Ball_Y_Motion_in = (~(Ball_Y_Step) + 1'b1);  // 2's complement.  
+						Ball_Y_Incr_in = ~(Ball_Y_Step) + 1'b1;
+						Ball_Y_Motion_in = 10'b0;
 					end
 				else if ( Ball_Y_Pos <= Ball_Y_Min + Ball_Size )  // Ball is at the top edge, BOUNCE!
                 begin
-						Ball_Y_Pos_in = Ball_Y_Pos + 1'b1;
-						Ball_X_Pos_in = Ball_X_Pos;
-						//Ball_X_Motion_in = 10'b0;
-						//Ball_Y_Motion_in = Ball_Y_Step;
+						Ball_Y_Motion_in = Ball_Y_Step;
 					end
-				// TODO: Add other boundary detections and handle keypress here.
-				
 				else if ( Ball_X_Pos + Ball_Size >= Enemy_X_Curr_Pos - Enemy_X_Size ) // Ball is at the right edge, BOUNCE!
 					begin
-						Ball_Y_Pos_in = Ball_Y_Pos;
-						Ball_X_Pos_in = Ball_X_Pos - 1'b1;
-						//Ball_X_Motion_in = (~(Ball_X_Step) + 1'b1); 
-						//Ball_Y_Motion_in = 10'b0;
+						Ball_X_Incr_in = ~(Ball_X_Step) + 1'b1;
 					end
 				else if ( Ball_X_Pos <= Ball_X_Min + Ball_Size ) // Ball is at the left edge, BOUNCE!
 					begin
-						Ball_Y_Pos_in = Ball_Y_Pos;
-						Ball_X_Pos_in = Ball_X_Pos + 1'b1;
-						//Ball_X_Motion_in = Ball_X_Step;
-						//Ball_Y_Motion_in = 10'b0;
+						Ball_X_Incr_in = Ball_X_Step;
 					end
 				
-            // Update the ball's position with its motion
-            //Ball_X_Pos_in = Ball_X_Pos + Ball_X_Motion;
-            //Ball_Y_Pos_in = Ball_Y_Pos + Ball_Y_Motion;
+            // Update the ball's position with its motion and increment
+            Ball_X_Pos_in = Ball_X_Pos + Ball_X_Motion + Ball_X_Incr;
+            Ball_Y_Pos_in = Ball_Y_Pos + Ball_Y_Motion + Ball_Y_Incr;
         end
     end
     
@@ -153,9 +149,5 @@ module  player ( input       Clk,                // 50 MHz clock
             is_ball = 1'b1;
         else
             is_ball = 1'b0;
-        /* The ball's (pixelated) circle is generated using the standard circle formula.  Note that while 
-           the single line is quite powerful descriptively, it causes the synthesis tool to use up three
-           of the 12 available multipliers on the chip! */
     end
-    
 endmodule
