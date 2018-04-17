@@ -41,7 +41,7 @@ module projectile(input				Clk,
         if (Reset)
         begin
 				// Stay fixed to shooter
-				is_active <= 1'b1;
+				is_active <= 1'b0;
             Proj_X_Pos <= Proj_X_Center;
             Proj_Y_Pos <= Proj_Y_Center;
             Proj_X_Motion <= 10'd0;
@@ -83,7 +83,7 @@ module projectile(input				Clk,
 						is_active_in = 1'b1;
 					end
 					
- 				if ( Proj_X_Pos - Proj_Size >= Target_X_Curr_Pos)//Proj_X_Max)
+ 				if ( Proj_X_Pos >= Target_X_Curr_Pos)//Proj_X_Max)
 					begin
 						// Stay fixed to shooter
 						is_active_in = 1'd0;
@@ -112,7 +112,7 @@ module projectile(input				Clk,
 					else
 						is_proj = 1'b0;
 				end
-        else
+			else
             is_proj = 1'b0;
         /* The ball's (pixelated) circle is generated using the standard circle formula.  Note that while 
            the single line is quite powerful descriptively, it causes the synthesis tool to use up three

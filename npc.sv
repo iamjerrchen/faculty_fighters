@@ -25,7 +25,7 @@ module  npc ( input         Clk,                // 50 MHz clock
     parameter [9:0] Ball_Y_Step = 10'd1;      // Step size on the Y axis
     parameter [9:0] Ball_Size = 10'd4;        // Ball size
 	 
-    assign Ball_X_Size = Ball_Size;
+    assign NPC_X_Size = Ball_Size;
     logic [9:0] Ball_X_Pos, Ball_X_Motion, Ball_Y_Pos, Ball_Y_Motion;
     logic [9:0] Ball_X_Pos_in, Ball_X_Motion_in, Ball_Y_Pos_in, Ball_Y_Motion_in;
 	 logic [9:0] Ball_X_Incr, Ball_Y_Incr, Ball_X_Incr_in, Ball_Y_Incr_in; // keystroke provides a signed increment amount
