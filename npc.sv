@@ -20,7 +20,7 @@ module  npc ( input         Clk,                // 50 MHz clock
     //parameter [9:0] Ball_X_Min = 10'd0;       // Leftmost point on the X axis
     parameter [9:0] Ball_X_Max = 10'd639;     // Rightmost point on the X axis
     parameter [9:0] Ball_Y_Min = 10'd340;       // Topmost point on the Y axis
-    parameter [9:0] Ball_Y_Max = 10'd380;     // Bottommost point on the Y axis
+    parameter [9:0] Ball_Y_Max = 10'd381;     // Bottommost point on the Y axis
     parameter [9:0] Ball_X_Step = 10'd1;      // Step size on the X axis
     parameter [9:0] Ball_Y_Step = 10'd1;      // Step size on the Y axis
     parameter [9:0] Ball_Size = 10'd4;        // Ball size
