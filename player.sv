@@ -1,4 +1,4 @@
-module  player (input					Clk,						// 50 MHz clock
+module player (input					Clk,						// 50 MHz clock
 												Reset,					// Active-high reset signal
 												frame_clk,				// The clock indicating a new frame (~60Hz)
 					input [9:0]				Player_X_Center,
@@ -6,7 +6,7 @@ module  player (input					Clk,						// 50 MHz clock
 												
 					input [9:0]	  			Enemy_X_Curr_Pos,
 												Enemy_Y_Curr_Pos,
-					input [9:0] 			Enemy_X_Size,
+												Enemy_X_Size,
 					
 					// Outputting Player current pos
 					output logic [9:0] 	Player_X_Curr_Pos,
@@ -22,8 +22,8 @@ module  player (input					Clk,						// 50 MHz clock
    
 	// constants
 	parameter [9:0] Player_X_Min = 10'd0;       // Leftmost point on the X axis
-	//parameter [9:0] Player_X_Max = 10'd639;     // Rightmost point on the X axis
-	parameter [9:0] Player_Y_Min = 10'd340;       // Topmost point on the Y axis
+	//parameter [9:0] Player_X_Max = 10'd639;   // Rightmost point on the X axis
+	parameter [9:0] Player_Y_Min = 10'd340;     // Topmost point on the Y axis
 	parameter [9:0] Player_Y_Max = 10'd381;     // Bottommost point on the Y axis
 	parameter [9:0] Player_X_Step = 10'd1;      // Step size on the X axis
 	parameter [9:0] Player_Y_Step = 10'd1;      // Step size on the Y axis
@@ -97,13 +97,13 @@ module  player (input					Clk,						// 50 MHz clock
 					end
 				else if(keycode == 8'd22) // S (down)
 					begin
-						Player_X_Incr_in = 1'b0;;
+						Player_X_Incr_in = 1'b0;
 						Player_Y_Incr_in = 1'b0;
 					end
 				else if(Right)//keycode == 8'd7) // D (right)
 					begin
 						Player_X_Incr_in = Player_X_Step;
-						Player_Y_Incr_in = 1'b0;;
+						Player_Y_Incr_in = 1'b0;
 					end
 				else
 					begin
@@ -113,9 +113,7 @@ module  player (input					Clk,						// 50 MHz clock
 					
 				// Be careful when using comparators with "logic" datatype because compiler treats 
             //   both sides of the operator as UNSIGNED numbers.
-            // e.g. Ball_Y_Pos - Ball_Size <= Ball_Y_Min 
-            // If Ball_Y_Pos is 0, then Ball_Y_Pos - Ball_Size will not be -4, but rather a large positive number.
-            if(Player_Y_Pos + Player_Size >= Player_Y_Max)  // Ball is at the bottom edge, BOUNCE!
+            if(Player_Y_Pos + Player_Size >= Player_Y_Max)  // Ball is at the bottom edge, STOP!
 					begin
 						Player_Y_Incr_in = ~(Player_Y_Step) + 1'b1;
 						Player_Y_Motion_in = 10'b0;
@@ -124,11 +122,11 @@ module  player (input					Clk,						// 50 MHz clock
                 begin
 						Player_Y_Motion_in = Player_Y_Step;
 					end
-				else if(Player_X_Pos + Player_Size >= Enemy_X_Curr_Pos + ~(Enemy_X_Size) + 1'b1) // Ball is at the right edge, BOUNCE!
+				else if(Player_X_Pos + Player_Size >= Enemy_X_Curr_Pos + ~(Enemy_X_Size) + 1'b1) // Ball is at the right edge, step back.
 					begin
 						Player_X_Incr_in = ~(Player_X_Step) + 1'b1;
 					end
-				else if(Player_X_Pos <= Player_X_Min + Player_Size) // Ball is at the left edge, BOUNCE!
+				else if(Player_X_Pos <= Player_X_Min + Player_Size) // Ball is at the left edge, step back.
 					begin
 						Player_X_Incr_in = Player_X_Step;
 					end

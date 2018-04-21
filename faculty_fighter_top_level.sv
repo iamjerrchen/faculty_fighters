@@ -38,6 +38,7 @@ module faculty_fighter_top_level(
     
     logic Reset_h, Clk;
     logic [7:0] keycode;
+	 logic Shoot_h;
     
 	 // synchronizer
     assign Clk = CLOCK_50;
@@ -124,6 +125,7 @@ module faculty_fighter_top_level(
 	 parameter Y_Center1 = 10'd375;
 	 parameter X_Center2 = 10'd360;
 	 parameter Y_Center2 = 10'd375;
+	 parameter Proj_X_Speed = 10'd4;
 	 
 	 logic [9:0] Player_X_Size, NPC_X_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr, Proj_X_curr, Proj_Y_curr;
@@ -166,7 +168,7 @@ module faculty_fighter_top_level(
 							.frame_clk(VGA_VS),
 							.Proj_X_Center(Player_X_curr), // Shooter's Center
 							.Proj_Y_Center(Player_Y_curr),
-							.Proj_X_Step(10'd1),
+							.Proj_X_Step(Proj_X_Speed),
 							
 							.Proj_X_Curr_Pos(Proj_X_curr),
 							.Proj_Y_Curr_Pos(Proj_Y_curr),
@@ -211,8 +213,8 @@ module faculty_fighter_top_level(
 	 npc npc_instance(.Clk(Clk),
 								.Reset(Reset_h || Soft_Reset_h),
 								.frame_clk(VGA_VS),
-								.Ball_X_Center(X_Center2),
-								.Ball_Y_Center(Y_Center2),
+								.NPC_X_Center(X_Center2),
+								.NPC_Y_Center(Y_Center2),
 								
 								.NPC_X_Curr_Pos(NPC_X_curr),
 								.NPC_Y_Curr_Pos(NPC_Y_curr),
@@ -220,7 +222,7 @@ module faculty_fighter_top_level(
 								.Enemy_X_Curr_Pos(Player_X_curr),
 								.Enemy_Y_Curr_Pos(Player_Y_curr),
 								.Enemy_X_Size(Player_X_Size),
-								
+								// controls
 								.Up(NPC_Up_h),
 								.Left(NPC_Left),
 								.Right(NPC_Right),
@@ -228,7 +230,7 @@ module faculty_fighter_top_level(
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
-								.is_ball(is_npc));
+								.is_npc(is_npc));
     
     color_mapper color_instance(.is_ball1(is_player),
 											.is_ball2(is_npc),
