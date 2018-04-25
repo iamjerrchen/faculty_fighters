@@ -34,7 +34,7 @@ module  color_mapper ( input              is_ball1,            // Whether curren
 	assign VGA_R = Red;
 	assign VGA_G = Green;
 	assign VGA_B = Blue;
-    
+   
 	// Assign color based on is_ball signal
 	always_comb
 	begin
