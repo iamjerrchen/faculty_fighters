@@ -8,15 +8,14 @@
  *			1 column left and right are empty.
  *			Remaining rows and columns represent the bitmap.
  */
-module font_rom (	input [5:0] addr,
+module font_rom (	input [9:0] addr,
 						output [7:0] data
 						);
 						
-	parameter ADDR_WIDTH = 6; // addressability
+	parameter ADDR_WIDTH = 10; // addressability
 	parameter DATA_WIDTH = 8;
-	logic [ADDR_WIDTH-1:0] addr_reg;
-	
-	assign data = ROM[addr]; // read bitmap for font
+
+	assign data = ROM[addr][7:0];//ROM[addr]; // read bitmap for font
 	
 	// ROM definition
 	parameter [0:2**ADDR_WIDTH-1][DATA_WIDTH-1:0] ROM = {
@@ -40,8 +39,8 @@ module font_rom (	input [5:0] addr,
 		// n = x01, 1
 		8'b00000000, // 0
 		8'b00000000, // 1
-		8'b00011000, // 2
-		8'b00111000, // 3
+		8'b00011100, // 2
+		8'b00111100, // 3
 		8'b01101100, // 4
 		8'b00001100, // 5
 		8'b00001100, // 6
@@ -187,7 +186,7 @@ module font_rom (	input [5:0] addr,
 		8'b01100110, // a
 		8'b01100110, // b
 		8'b01100110, // c
-		8'b0011110, // d
+		8'b00111110, // d
 		8'b00000000, // e
 		8'b00000000, // f
 		// n = x0A, A
@@ -1107,7 +1106,8 @@ module font_rom (	input [5:0] addr,
 		8'b00110000, // c
 		8'b00110000, // d
 		8'b00000000, // e
-		8'b00000000, // f
+		8'b00000000  // f
 	};
-						
+
+			
 endmodule

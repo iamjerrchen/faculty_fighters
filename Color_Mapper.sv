@@ -28,22 +28,60 @@ module  color_mapper ( input              is_ball1,            // Whether curren
                        output logic [7:0] VGA_R, VGA_G, VGA_B // VGA RGB output
                      );
 							
+	parameter [9:0] font_x_start = 200;
+	parameter [9:0] font_y_start = 400;
+	parameter [9:0] font_size_x = 8;
+	parameter [9:0] font_size_y = 16;
+	
 	logic [7:0] Red, Green, Blue;
+	logic [9:0] font_addr; // addressing font_rom
+	logic [7:0] font_bitmap; // data from rom
+	logic char_on;
+	
+	font_rom (.addr(font_addr),
+				.data(font_bitmap)
+				);
 	
 	// Output colors to VGA
 	assign VGA_R = Red;
 	assign VGA_G = Green;
 	assign VGA_B = Blue;
    
+	always_comb
+	begin
+		if(DrawX >= font_x_start && DrawX < font_x_start + font_size_x &&
+			DrawY >= font_y_start && DrawY < font_y_start + font_size_y)
+			char_on = 1'b1;
+		else
+			char_on = 1'b0;
+	end
+
 	// Assign color based on is_ball signal
 	always_comb
 	begin
+		font_addr = (DrawY - font_y_start + 16*'hf);
 		if (start_l)
 		begin
-			// orange
-			Red = 8'hFF;
-			Green = 8'h6D;
-			Blue = 8'h00;
+			// Text
+			if((char_on == 1'b1) && (font_bitmap[7 - DrawX - font_x_start] == 1'b1))
+			begin
+				Red = 8'hff;
+				Green = 8'hff;
+				Blue = 8'hff;
+			end
+			else if(char_on == 1'b1 && (font_bitmap[7- DrawX - font_x_start] == 1'b0))
+			begin
+				Red = 8'h00;
+				Green = 8'h00;
+				Blue = 8'h00;
+			end
+			else
+			begin
+				// Background
+				Red = 8'hFF;
+				Green = 8'h6D;
+				Blue = 8'h00;
+			end
 		end // end start_l
 		
 		else if(win_l)
