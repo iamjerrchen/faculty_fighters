@@ -51,7 +51,7 @@ def palletize_background_8(File, colors):
 		# hexstr = convert_int_to_hexstr(best_color[0]) + convert_int_to_hexstr(best_color[1]) + convert_int_to_hexstr(best_color[2])
 		hexstr = convert_int_to_hexstr(best_color)
 		colors_str.append(hexstr)
-		File.write(hexstr + '\n')
+		File.write("3'h" + hexstr + ',\n')
 
 	return colors_str
 
