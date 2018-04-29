@@ -39,7 +39,7 @@ module  color_mapper (	input					Clk,
 	logic [9:0] font_addr, n; // addressing font_rom
 	logic [7:0] font_bitmap; // data from rom
 	
-	logic [9:0] FONT_start;
+	logic [9:0] FONT_y_start;
 	logic [9:0] FIGHT_x_start, FIGHT_y_start, FIGHT_n;
 	logic [9:0] DEFEAT_x_start, DEFEAT_y_start, DEFEAT_n;
 	logic [9:0] VICTORY_x_start, VICTORY_y_start, VICTORY_n;
@@ -49,17 +49,12 @@ module  color_mapper (	input					Clk,
 				.data(font_bitmap)
 				);
 				
-	parameter sprite_start_x = 320;
-	parameter sprite_start_y = 240;
-	parameter dimension_size = 20;
-	logic [9:0] 	RAM_addr;
 	logic [23:0]	RAM_data;
-	background_frameRAM(.read_address(RAM_addr),
+	background_frameRAM(.DrawX(DrawX),
+								.DrawY(DrawY),
 								.Clk(Clk),
 								.data_out(RAM_data)
 								);
-
-	assign RAM_addr = 10'd46; // access random pixel
 	
 	// Assign color based on is_ball signal
 	always_comb
@@ -67,26 +62,26 @@ module  color_mapper (	input					Clk,
 		// assigning character logic
 		if(is_FIGHT == 1'b1)
 		begin
-			FONT_start = FIGHT_y_start;
+			FONT_y_start = FIGHT_y_start;
 			n = FIGHT_n;
 		end
 		else if(is_DEFEAT == 1'b1)
 		begin
-			FONT_start = DEFEAT_y_start;
+			FONT_y_start = DEFEAT_y_start;
 			n = DEFEAT_n;
 		end
 		else if(is_VICTORY == 1'b1)
 		begin
-			FONT_start = VICTORY_y_start;
+			FONT_y_start = VICTORY_y_start;
 			n = VICTORY_n;
 		end
 		else
 		begin
-			FONT_start = 0;
+			FONT_y_start = 0;
 			n = 10'h0;
 		end
 		/* --------------------------------------------------------------------------- */
-		font_addr = (DrawY - FONT_start + 16*n);
+		font_addr = (DrawY - FONT_y_start + 16*n);
 		if (start_l)
 		begin
 			// Text
@@ -98,13 +93,10 @@ module  color_mapper (	input					Clk,
 			end
 			else
 			begin
+				// Background
 				Red = RAM_data[23:16];
 				Green = RAM_data[15:8];
 				Blue = RAM_data[7:0];
-				// Background
-//				Red = 8'h00;
-//				Green = 8'h00;
-//				Blue = 8'hFF;
 			end
 		end // end start_l
 		/* --------------------------------------------------------------------------- */
