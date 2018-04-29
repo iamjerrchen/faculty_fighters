@@ -232,7 +232,8 @@ module faculty_fighter_top_level(
 								.DrawY(DrawY),
 								.is_npc(is_npc));
     
-    color_mapper color_instance(.is_ball1(is_player),
+    color_mapper color_instance(	.Clk(Clk),
+											.is_ball1(is_player),
 											.is_ball2(is_npc),
 											.is_proj(is_proj),
 											// stage

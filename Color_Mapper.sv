@@ -14,7 +14,8 @@
 //-------------------------------------------------------------------------
 
 // color_mapper: Decide which color to be output to VGA for each pixel.
-module  color_mapper ( input              is_ball1,            // Whether current pixel belongs to ball 
+module  color_mapper (	input					Clk,
+								input             is_ball1,            // Whether current pixel belongs to ball 
 														is_ball2,
 														is_proj,
 														// stage
@@ -23,9 +24,9 @@ module  color_mapper ( input              is_ball1,            // Whether curren
 														win_l,
 														lose_l,
 														
-                                                              //   or background (computed in ball.sv)
-                       input        [9:0] DrawX, DrawY,       // Current pixel coordinates
-                       output logic [7:0] VGA_R, VGA_G, VGA_B // VGA RGB output
+																					//   or background (computed in ball.sv)
+								input        [9:0] DrawX, DrawY,       // Current pixel coordinates
+								output logic [7:0] VGA_R, VGA_G, VGA_B // VGA RGB output
                      );
 	
 	logic [7:0] Red, Green, Blue;
@@ -47,10 +48,23 @@ module  color_mapper ( input              is_ball1,            // Whether curren
 	font_rom (.addr(font_addr),
 				.data(font_bitmap)
 				);
+				
+	parameter sprite_start_x = 320;
+	parameter sprite_start_y = 240;
+	parameter dimension_size = 20;
+	logic [9:0] 	RAM_addr;
+	logic [23:0]	RAM_data;
+	background_frameRAM(.read_address(RAM_addr),
+								.Clk(Clk),
+								.data_out(RAM_data)
+								);
 
+	assign RAM_addr = 10'd46; // access random pixel
+	
 	// Assign color based on is_ball signal
 	always_comb
 	begin
+		// assigning character logic
 		if(is_FIGHT == 1'b1)
 		begin
 			FONT_start = FIGHT_y_start;
@@ -84,10 +98,13 @@ module  color_mapper ( input              is_ball1,            // Whether curren
 			end
 			else
 			begin
+				Red = RAM_data[23:16];
+				Green = RAM_data[15:8];
+				Blue = RAM_data[7:0];
 				// Background
-				Red = 8'h00;
-				Green = 8'h00;
-				Blue = 8'hFF;
+//				Red = 8'h00;
+//				Green = 8'h00;
+//				Blue = 8'hFF;
 			end
 		end // end start_l
 		/* --------------------------------------------------------------------------- */
