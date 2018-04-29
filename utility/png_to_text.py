@@ -36,7 +36,26 @@ def closest_color(pallete, pixel):
 			best_color = idx
 	return best_color
 
-def palletize_background_8(File, colors):
+def palettize_char_8(File, colors):
+	pallete = [[59, 42, 22],
+				[252, 251, 109],
+				[29, 53, 149],
+				[60, 81, 172],
+				[133, 104, 46],
+				[243, 193, 144],
+				[119, 1, 97],
+				[108, 108, 108]]
+	colors_str = []
+	for pixel in colors:
+		best_color = closest_color(pallete, pixel)
+		# hexstr = convert_int_to_hexstr(best_color[0]) + convert_int_to_hexstr(best_color[1]) + convert_int_to_hexstr(best_color[2])
+		hexstr = convert_int_to_hexstr(best_color)
+		colors_str.append(hexstr)
+		File.write(hexstr + '\n')
+
+	return colors_str
+
+def palettize_background_8(File, colors):
 	pallete = [[121,202,249],
 				[127,172,113],
 				[244,247,252],
@@ -51,7 +70,7 @@ def palletize_background_8(File, colors):
 		# hexstr = convert_int_to_hexstr(best_color[0]) + convert_int_to_hexstr(best_color[1]) + convert_int_to_hexstr(best_color[2])
 		hexstr = convert_int_to_hexstr(best_color)
 		colors_str.append(hexstr)
-		File.write("3'h" + hexstr + ',\n')
+		File.write(hexstr + '\n')
 
 	return colors_str
 
@@ -78,7 +97,11 @@ def main():
 	        # outFile.write("%x%x%x\n" %(r,g,b))
 	        colors_int.append([r, g, b])
 
-	check = palletize_background_8(outFile, colors_int)
+	if(filename == "background"):
+		check = palettize_background_8(outFile, colors_int)
+	if(filename ==  "char"):
+		check = palettize_char_8(outFile, colors_int)
+
 	outFile.close()
 	outImg.save(filename+ ".png")
 
