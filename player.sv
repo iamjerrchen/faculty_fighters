@@ -12,16 +12,15 @@ module player (input						Clk,						// 50 MHz clock
 					output logic [9:0] 	Player_X_Curr_Pos,
 												Player_Y_Curr_Pos,
 												Player_X_Size,
-												Player_Y_Size,
 					
 					input						Up, Left, Right,
 					
 					input [7:0]				keycode,					// keycode exported form qsys
 					input [9:0]				DrawX, DrawY,			// Current pixel coordinates
 					
-					output logic			is_player,				// Whether current pixel belongs to player or background
-												pixel_on,
-					output logic [23:0]	player_pixel
+					input	[9:0]				sprite_size_x,
+					output logic [11:0]	Player_RAM_addr,		
+					output logic			is_player				// Whether current pixel belongs to player or background
 				  );
    
 	// constants
@@ -39,9 +38,10 @@ module player (input						Clk,						// 50 MHz clock
 	logic [9:0] Player_X_Incr, Player_Y_Incr, Player_X_Incr_in, Player_Y_Incr_in;
 	
 	assign Player_X_Size = Player_Size_X;
-	assign Player_Y_Size = Player_Size_Y;
 	assign Player_X_Curr_Pos = Player_X_Pos;
 	assign Player_Y_Curr_Pos = Player_Y_Pos;
+	
+	assign Player_RAM_addr = (DrawY - Player_Y_Pos)*sprite_size_x + (DrawX - Player_X_Pos); // access sprite left to right
 	
 	//////// Do not modify the always_ff blocks. ////////
 	// Detect rising edge of frame_clk
@@ -128,7 +128,7 @@ module player (input						Clk,						// 50 MHz clock
                 begin
 						Player_Y_Motion_in = Player_Y_Step;
 					end
-				else if(Player_X_Pos + Player_Size_X >= Enemy_X_Curr_Pos + ~(Enemy_X_Size) + 1'b1) // Ball is at the right edge, step back.
+				else if(Player_X_Pos + Player_Size_X >= Enemy_X_Curr_Pos) // Ball is at the right edge, step back.
 					begin
 						Player_X_Incr_in = ~(Player_X_Step) + 1'b1;
 					end
@@ -142,15 +142,8 @@ module player (input						Clk,						// 50 MHz clock
             Player_Y_Pos_in = Player_Y_Pos + Player_Y_Motion + Player_Y_Incr;
         end
     end
-    
-	 // coloring for character
-	 char_frameRAM colors(.DrawX(DrawX),
-								.DrawY(DrawY),
-								.sprite_x_start(Player_X_Pos),
-								.sprite_y_start(Player_Y_Pos),
-								.pixel_on(pixel_on),
-								.data_out(player_pixel));
 	 
+	 // If current pixel is the character
     always_comb
 	 begin
         if (DrawX >= Player_X_Pos && DrawX < Player_X_Pos + Player_Size_X &&

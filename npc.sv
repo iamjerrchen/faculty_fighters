@@ -17,25 +17,31 @@ module npc (input						Clk,                // 50 MHz clock
 				
 				input [7:0]				keycode,					// keycode exported form qsys
 				input [9:0]				DrawX, DrawY,			// Current pixel coordinates
+
+				input [9:0]				sprite_size_x,
+				output logic [11:0]	NPC_RAM_addr,
 				output logic			is_npc					// Whether current pixel belongs to ball or background
 				);
     
 	// constants
    //parameter [9:0] NPC_X_Min = 10'd0;     // Leftmost point on the X axis
 	parameter [9:0] NPC_X_Max = 10'd639;     // Rightmost point on the X axis
-	parameter [9:0] NPC_Y_Min = 10'd340;     // Topmost point on the Y axis
-	parameter [9:0] NPC_Y_Max = 10'd381;     // Bottommost point on the Y axis
+	parameter [9:0] NPC_Y_Min = 10'd290;     // Topmost point on the Y axis
+	parameter [9:0] NPC_Y_Max = 10'd420;     // Bottommost point on the Y axis
 	parameter [9:0] NPC_X_Step = 10'd1;      // Step size on the X axis
 	parameter [9:0] NPC_Y_Step = 10'd1;      // Step size on the Y axis
-	parameter [9:0] NPC_Size = 10'd4;        // Ball size
+	parameter [9:0] NPC_Size_X = 41; 
+	parameter [9:0] NPC_Size_Y = 64; // 65
 	 
 	logic [9:0] NPC_X_Pos, NPC_X_Motion, NPC_Y_Pos, NPC_Y_Motion;
 	logic [9:0] NPC_X_Pos_in, NPC_X_Motion_in, NPC_Y_Pos_in, NPC_Y_Motion_in;
 	logic [9:0] NPC_X_Incr, NPC_Y_Incr, NPC_X_Incr_in, NPC_Y_Incr_in; // keystroke provides an increment amount
 	 
-	assign NPC_X_Size = NPC_Size;
+	assign NPC_X_Size = NPC_Size_X;
 	assign NPC_X_Curr_Pos = NPC_X_Pos;
 	assign NPC_Y_Curr_Pos = NPC_Y_Pos;
+	
+	assign NPC_RAM_addr = (DrawY - NPC_Y_Pos)*sprite_size_x + (sprite_size_x - DrawX - NPC_X_Pos); // access sprite right to left
 	
 	//////// Do not modify the always_ff blocks. ////////
 	// Detect rising edge of frame_clk
@@ -84,7 +90,7 @@ module npc (input						Clk,                // 50 MHz clock
 		if (frame_clk_rising_edge)
 			begin
 				// Keypress logic
-				if(Up)//keycode == 8'h52) // W (up)
+				if(Up && (NPC_Y_Motion != 1'b1))//keycode == 8'h52) // W (up)
 					begin
 						NPC_X_Incr_in = 1'b0;
 						NPC_Y_Incr_in = 1'b0;
@@ -102,7 +108,7 @@ module npc (input						Clk,                // 50 MHz clock
 					end
 				else if(Right)//keycode == 8'h4f) // D (right)
 					begin
-						NPC_X_Incr_in = 1'b1;
+						NPC_X_Incr_in = NPC_X_Step; // recently changed before test
 						NPC_Y_Incr_in = 1'b0;
 					end
 				else
@@ -113,20 +119,20 @@ module npc (input						Clk,                // 50 MHz clock
 					
 				// Be careful when using comparators with "logic" datatype because compiler treats 
 				//   both sides of the operator as UNSIGNED numbers.
-				if(NPC_Y_Pos + NPC_Size >= NPC_Y_Max)  // Ball is at the bottom edge, STOP!
+				if(NPC_Y_Pos + NPC_Size_Y >= NPC_Y_Max)  // Ball is at the bottom edge, STOP!
 					begin
 						NPC_Y_Incr_in = ~(NPC_Y_Step) + 1'b1;
 						NPC_Y_Motion_in = 10'b0; 
 					end
-				else if (NPC_Y_Pos <= NPC_Y_Min + NPC_Size)  // Ball is at the top edge, BOUNCE!
+				else if (NPC_Y_Pos <= NPC_Y_Min)  // Ball is at the top edge, BOUNCE!
 					begin
 						NPC_Y_Motion_in = NPC_Y_Step;
 					end
-				else if (NPC_X_Pos + NPC_Size >= NPC_X_Max) // Ball is at the right edge, step back.
+				else if (NPC_X_Pos + NPC_Size_X >= NPC_X_Max) // Ball is at the right edge, step back.
 					begin
 						NPC_X_Incr_in = ~(NPC_X_Step) + 1'b1;
 					end
-				else if (NPC_X_Pos - NPC_Size <= Enemy_X_Curr_Pos + Enemy_X_Size) // Ball is at the left edge, step back.
+				else if (NPC_X_Pos <= Enemy_X_Curr_Pos + Enemy_X_Size) // Ball is at the left edge, step back.
 					begin
 						NPC_X_Incr_in = NPC_X_Step;
 					end
@@ -137,15 +143,11 @@ module npc (input						Clk,                // 50 MHz clock
 			end
 	end
 	
-	// Compute whether the pixel corresponds to ball or background
-	/* Since the multiplicants are required to be signed, we have to first cast them
-		from logic to int (signed by default) before they are multiplied. */
-	int DistX, DistY, Size;
-	assign DistX = DrawX - NPC_X_Pos;
-	assign DistY = DrawY - NPC_Y_Pos;
-	assign Size = NPC_Size;
-	always_comb begin
-		if ( ( DistX*DistX + DistY*DistY) <= (Size*Size) ) 
+	// If current pixel is the character
+	always_comb
+	begin
+		if (DrawX >= NPC_X_Pos && DrawX < NPC_X_Pos + NPC_Size_X &&
+				DrawY >= NPC_Y_Pos && DrawY < NPC_Y_Pos + NPC_Size_Y) 
 			is_npc = 1'b1;
 		else
 			is_npc = 1'b0;

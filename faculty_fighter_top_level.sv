@@ -122,6 +122,8 @@ module faculty_fighter_top_level(
 	 logic bullet_contact;
 	 
 	 logic [23:0] player_pixel, npc_pixel;
+	 logic [11:0] Player_RAM_addr, NPC_RAM_addr;
+	 logic [9:0] sprite_size_x;
 	 
 	 // constants for characters
 	 parameter Player_X_Init = 10'd260;
@@ -190,7 +192,7 @@ module faculty_fighter_top_level(
 							.Coverage(NPC_X_Size),
 							.contact(bullet_contact));
 												
-    // Which signal should be frame_clk?
+    // Which signal should be frame_clk? VGA_VS
     player player_instance(.Clk(Clk),
 								.Reset(Reset_h || Soft_Reset_h),
 								.frame_clk(VGA_VS),
@@ -211,9 +213,10 @@ module faculty_fighter_top_level(
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
-								.is_player(is_player),
-								.pixel_on(player_pixel_on),
-								.player_pixel(player_pixel));
+								
+								.sprite_size_x(sprite_size_x),
+								.Player_RAM_addr(Player_RAM_addr),
+								.is_player(is_player));
 								
 	 npc npc_instance(.Clk(Clk),
 								.Reset(Reset_h || Soft_Reset_h),
@@ -235,8 +238,20 @@ module faculty_fighter_top_level(
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
+								
+								.sprite_size_x(sprite_size_x),
+								.NPC_RAM_addr(NPC_RAM_addr),
 								.is_npc(is_npc));
-    
+	 
+	 // coloring for character
+	 char_frameRAM colors(.Player_address(Player_RAM_addr),
+								.NPC_address(NPC_RAM_addr),
+								.sprite_size_x(sprite_size_x),
+								.player_pixel_on(player_pixel_on),
+								.npc_pixel_on(npc_pixel_on),
+								.Player_pixel(player_pixel),
+								.NPC_pixel(npc_pixel));
+	 
     color_mapper color_instance(	.Clk(Clk),
 											.is_player(is_player),
 											.is_npc(is_npc),
@@ -249,6 +264,8 @@ module faculty_fighter_top_level(
 											
 											.player_pixel_on(player_pixel_on),
 											.player_pixel(player_pixel),
+											.npc_pixel_on(npc_pixel_on),
+											.npc_pixel(npc_pixel),
 											
 											.DrawX(DrawX),
 											.DrawY(DrawY),

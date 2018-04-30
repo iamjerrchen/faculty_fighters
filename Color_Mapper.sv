@@ -6,6 +6,7 @@
 //    Modified by David Kesler  07-16-2008                               --
 //    Translated by Joe Meng    07-07-2013                               --
 //    Modified by Po-Han Huang  10-06-2017                               --
+//    Modified by Jerry Chen	  04-30-2018                               --
 //                                                                       --
 //    Fall 2017 Distribution                                             --
 //                                                                       --
@@ -25,8 +26,9 @@ module  color_mapper (	input					Clk,
 														lose_l,
 														
 								input					player_pixel_on,
+														npc_pixel_on,
 								input [23:0]		player_pixel,
-														
+														npc_pixel,
 																					//   or background (computed in ball.sv)
 								input        [9:0] DrawX, DrawY,       // Current pixel coordinates
 								output logic [7:0] VGA_R, VGA_G, VGA_B // VGA RGB output
@@ -150,10 +152,9 @@ module  color_mapper (	input					Clk,
 			end
 			else if (is_npc == 1'b1)
 			begin
-				// Black ball
-				Red = 8'h00;
-				Green = 8'h00;
-				Blue = 8'h00;
+				Red = npc_pixel[23:16];
+				Green = npc_pixel[15:8];
+				Blue = npc_pixel[7:0];
 			end
 			else if (is_proj == 1'b1)
 			begin
