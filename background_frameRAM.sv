@@ -1,7 +1,7 @@
 /*
  * ECE385-HelperTools/PNG-To-Txt
  * Author: Rishi Thakkar
- *
+ * Modified and Adapted: Jerry Chen
  */
 
 module  background_frameRAM

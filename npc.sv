@@ -1,8 +1,8 @@
 module npc (input						Clk,                // 50 MHz clock
 											Reset,              // Active-high reset signal
 											frame_clk,          // The clock indicating a new frame (~60Hz)
-				input [9:0]				NPC_X_Center,
-											NPC_Y_Center,
+				input [9:0]				NPC_X_Init,
+											NPC_Y_Init,
 				
 				input [9:0]				Enemy_X_Curr_Pos,
 											Enemy_Y_Curr_Pos,
@@ -51,8 +51,8 @@ module npc (input						Clk,                // 50 MHz clock
 	begin
 		if (Reset)
 			begin
-				NPC_X_Pos <= NPC_X_Center;
-				NPC_Y_Pos <= NPC_Y_Center;
+				NPC_X_Pos <= NPC_X_Init;
+				NPC_Y_Pos <= NPC_Y_Init;
 				NPC_X_Incr <= 10'd0;
 				NPC_Y_Incr <= 10'd0;
 				NPC_X_Motion <= 10'd0;

@@ -37,18 +37,28 @@ def closest_color(pallete, pixel):
 	return best_color
 
 def palettize_char_8(File, colors):
-	pallete = [[59, 42, 22],
-				[252, 251, 109],
-				[29, 53, 149],
-				[60, 81, 172],
-				[133, 104, 46],
-				[243, 193, 144],
-				[119, 1, 97],
-				[108, 108, 108]]
+	palette = [[255, 255, 255],
+				[251, 165, 0],
+				[30, 55, 145],
+				[58, 35, 19],
+				[102, 73, 17],
+				[162, 132, 70],
+				[110, 5, 89],
+				[109, 109, 109],
+				[63, 64, 68],
+				[224, 143, 122],
+				[60, 82, 168],
+				[83, 109, 196],
+				[133, 3, 5],
+				[134, 101, 47],
+				[228, 131, 34]]
+	for pixel in palette:
+		print pixel
+		print convert_int_to_hexstr(pixel[0]) + convert_int_to_hexstr(pixel[1]) + convert_int_to_hexstr(pixel[2])
+
 	colors_str = []
 	for pixel in colors:
-		best_color = closest_color(pallete, pixel)
-		# hexstr = convert_int_to_hexstr(best_color[0]) + convert_int_to_hexstr(best_color[1]) + convert_int_to_hexstr(best_color[2])
+		best_color = closest_color(palette, pixel)
 		hexstr = convert_int_to_hexstr(best_color)
 		colors_str.append(hexstr)
 		File.write(hexstr + '\n')

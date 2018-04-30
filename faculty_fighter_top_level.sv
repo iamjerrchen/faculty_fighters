@@ -118,13 +118,16 @@ module faculty_fighter_top_level(
 	 ////////// ADD STUFF HERE ///////////
 	 
 	 logic is_player, is_npc, is_proj;
+	 logic player_pixel_on, npc_pixel_on;
 	 logic bullet_contact;
 	 
+	 logic [23:0] player_pixel, npc_pixel;
+	 
 	 // constants for characters
-	 parameter X_Center1 = 10'd280;
-	 parameter Y_Center1 = 10'd375;
-	 parameter X_Center2 = 10'd360;
-	 parameter Y_Center2 = 10'd375;
+	 parameter Player_X_Init = 10'd260;
+	 parameter Player_Y_Init = 10'd355;
+	 parameter NPC_X_Init = 10'd360;
+	 parameter NPC_Y_Init = 10'd355;
 	 parameter Proj_X_Speed = 10'd4;
 	 
 	 logic [9:0] Player_X_Size, NPC_X_Size;
@@ -191,8 +194,8 @@ module faculty_fighter_top_level(
     player player_instance(.Clk(Clk),
 								.Reset(Reset_h || Soft_Reset_h),
 								.frame_clk(VGA_VS),
-								.Player_X_Center(X_Center1),
-								.Player_Y_Center(Y_Center1),
+								.Player_X_Init(Player_X_Init),
+								.Player_Y_Init(Player_Y_Init),
 								
 								.Player_X_Curr_Pos(Player_X_curr),
 								.Player_Y_Curr_Pos(Player_Y_curr),
@@ -208,13 +211,15 @@ module faculty_fighter_top_level(
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
-								.is_player(is_player));
+								.is_player(is_player),
+								.pixel_on(player_pixel_on),
+								.player_pixel(player_pixel));
 								
 	 npc npc_instance(.Clk(Clk),
 								.Reset(Reset_h || Soft_Reset_h),
 								.frame_clk(VGA_VS),
-								.NPC_X_Center(X_Center2),
-								.NPC_Y_Center(Y_Center2),
+								.NPC_X_Init(NPC_X_Init),
+								.NPC_Y_Init(NPC_Y_Init),
 								
 								.NPC_X_Curr_Pos(NPC_X_curr),
 								.NPC_Y_Curr_Pos(NPC_Y_curr),
@@ -233,8 +238,8 @@ module faculty_fighter_top_level(
 								.is_npc(is_npc));
     
     color_mapper color_instance(	.Clk(Clk),
-											.is_ball1(is_player),
-											.is_ball2(is_npc),
+											.is_player(is_player),
+											.is_npc(is_npc),
 											.is_proj(is_proj),
 											// stage
 											.start_l(start_l),
@@ -242,14 +247,15 @@ module faculty_fighter_top_level(
 											.win_l(win_l),
 											.lose_l(lose_l),
 											
+											.player_pixel_on(player_pixel_on),
+											.player_pixel(player_pixel),
+											
 											.DrawX(DrawX),
 											.DrawY(DrawY),
 											.VGA_R(VGA_R),
 											.VGA_G(VGA_G),
 											.VGA_B(VGA_B));
 											
-	
-    
    // Display keycode on hex display
    HexDriver hex_inst_0 (keycode[3:0], HEX0);
    HexDriver hex_inst_1 (keycode[7:4], HEX1);

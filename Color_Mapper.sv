@@ -15,14 +15,17 @@
 
 // color_mapper: Decide which color to be output to VGA for each pixel.
 module  color_mapper (	input					Clk,
-								input             is_ball1,            // Whether current pixel belongs to ball 
-														is_ball2,
+								input             is_player,            // Whether current pixel belongs to ball 
+														is_npc,
 														is_proj,
 														// stage
 														start_l,
 														battle_l,
 														win_l,
 														lose_l,
+														
+								input					player_pixel_on,
+								input [23:0]		player_pixel,
 														
 																					//   or background (computed in ball.sv)
 								input        [9:0] DrawX, DrawY,       // Current pixel coordinates
@@ -49,11 +52,11 @@ module  color_mapper (	input					Clk,
 				.data(font_bitmap)
 				);
 				
-	logic [23:0]	RAM_data;
+	logic [23:0] backgroundRAM_data;
 	background_frameRAM(.DrawX(DrawX),
 								.DrawY(DrawY),
 								.Clk(Clk),
-								.data_out(RAM_data)
+								.data_out(backgroundRAM_data)
 								);
 	
 	// Assign color based on is_ball signal
@@ -81,22 +84,22 @@ module  color_mapper (	input					Clk,
 			n = 10'h0;
 		end
 		/* --------------------------------------------------------------------------- */
-		font_addr = (DrawY - FONT_y_start + 16*n);
+		font_addr = (DrawY - FONT_y_start + 16*n); // accessing font ROM
 		if (start_l)
 		begin
 			// Text
 			if((is_FIGHT == 1'b1) && (font_bitmap[7 - DrawX - FIGHT_x_start] == 1'b1))
 			begin
-				Red = 8'h00;
+				Red = 8'hff;
 				Green = 8'h00;
 				Blue = 8'h00;
 			end
 			else
 			begin
 				// Background
-				Red = RAM_data[23:16];
-				Green = RAM_data[15:8];
-				Blue = RAM_data[7:0];
+				Red = 8'h00;
+				Green = 8'h00;
+				Blue = 8'h00;
 			end
 		end // end start_l
 		/* --------------------------------------------------------------------------- */
@@ -139,14 +142,13 @@ module  color_mapper (	input					Clk,
 		else //if(game_l)
 		begin
 			// characters
-			if (is_ball1 == 1'b1) 
+			if (is_player == 1'b1 && player_pixel_on == 1'b1) 
 			begin
-				// White ball
-				Red = 8'hff;
-				Green = 8'hff;
-				Blue = 8'hff;
+				Red = player_pixel[23:16];
+				Green = player_pixel[15:8];
+				Blue = player_pixel[7:0];
 			end
-			else if (is_ball2 == 1'b1)
+			else if (is_npc == 1'b1)
 			begin
 				// Black ball
 				Red = 8'h00;
@@ -163,20 +165,10 @@ module  color_mapper (	input					Clk,
 			
 			else // background
 			begin
-				if (DrawY >= 10'd380)
-				begin
-					// platform
-					Red = 8'h00;
-					Green = 8'hff;
-					Blue = 8'h00;
-				end
-				else
-				begin
-					// Background with nice color gradient
-					Red = 8'h3f; 
-					Green = 8'h00;
-					Blue = 8'h7f - {1'b0, DrawX[9:3]};
-				end
+				// Background with nice color gradient
+				Red = backgroundRAM_data[23:16];
+				Green = backgroundRAM_data[15:8];
+				Blue = backgroundRAM_data[7:0];
 			end // end_background
 		end // end game_l
 	end // end always_comb
