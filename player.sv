@@ -12,6 +12,7 @@ module player (input						Clk,						// 50 MHz clock
 					output logic [9:0] 	Player_X_Curr_Pos,
 												Player_Y_Curr_Pos,
 												Player_X_Size,
+												Player_Y_Size,
 					
 					input						Up, Left, Right,
 					
@@ -38,6 +39,7 @@ module player (input						Clk,						// 50 MHz clock
 	logic [9:0] Player_X_Incr, Player_Y_Incr, Player_X_Incr_in, Player_Y_Incr_in;
 	
 	assign Player_X_Size = Player_Size_X;
+	assign Player_Y_Size = Player_Size_Y;
 	assign Player_X_Curr_Pos = Player_X_Pos;
 	assign Player_Y_Curr_Pos = Player_Y_Pos;
 	
@@ -132,7 +134,7 @@ module player (input						Clk,						// 50 MHz clock
 					begin
 						Player_X_Incr_in = ~(Player_X_Step) + 1'b1;
 					end
-				else if(Player_X_Pos <= Player_X_Min) // Ball is at the left edge, step back.
+				else if(Player_X_Pos <= Player_X_Min + 1'b1) // Ball is at the left edge, step back.
 					begin
 						Player_X_Incr_in = Player_X_Step;
 					end

@@ -12,8 +12,10 @@ module npc (input						Clk,                // 50 MHz clock
 				output logic [9:0] 	NPC_X_Curr_Pos,
 											NPC_Y_Curr_Pos, 
 											NPC_X_Size,
+											NPC_Y_Size,
 											
 				input						Up, Left, Right,
+				input						hit_in,	// hit by a projectile
 				
 				input [7:0]				keycode,					// keycode exported form qsys
 				input [9:0]				DrawX, DrawY,			// Current pixel coordinates
@@ -21,6 +23,7 @@ module npc (input						Clk,                // 50 MHz clock
 				input [9:0]				sprite_size_x,
 				output logic [11:0]	NPC_RAM_addr,
 				output logic			is_npc					// Whether current pixel belongs to ball or background
+											//is_alive
 				);
     
 	// constants
@@ -32,16 +35,19 @@ module npc (input						Clk,                // 50 MHz clock
 	parameter [9:0] NPC_Y_Step = 10'd1;      // Step size on the Y axis
 	parameter [9:0] NPC_Size_X = 41; 
 	parameter [9:0] NPC_Size_Y = 64; // 65
-	 
+	
+	logic hit;
+	logic [4:0]	Curr_Health;
 	logic [9:0] NPC_X_Pos, NPC_X_Motion, NPC_Y_Pos, NPC_Y_Motion;
 	logic [9:0] NPC_X_Pos_in, NPC_X_Motion_in, NPC_Y_Pos_in, NPC_Y_Motion_in;
 	logic [9:0] NPC_X_Incr, NPC_Y_Incr, NPC_X_Incr_in, NPC_Y_Incr_in; // keystroke provides an increment amount
 	 
 	assign NPC_X_Size = NPC_Size_X;
+	assign NPC_Y_Size = NPC_Size_Y;
 	assign NPC_X_Curr_Pos = NPC_X_Pos;
 	assign NPC_Y_Curr_Pos = NPC_Y_Pos;
 	
-	assign NPC_RAM_addr = (DrawY - NPC_Y_Pos)*sprite_size_x + (sprite_size_x - DrawX - NPC_X_Pos); // access sprite right to left
+	assign NPC_RAM_addr = (DrawY - NPC_Y_Pos)*sprite_size_x + (sprite_size_x - (DrawX - NPC_X_Pos)); // access sprite right to left
 	
 	//////// Do not modify the always_ff blocks. ////////
 	// Detect rising edge of frame_clk
@@ -57,6 +63,7 @@ module npc (input						Clk,                // 50 MHz clock
 	begin
 		if (Reset)
 			begin
+				Curr_Health <= 5'd5;
 				NPC_X_Pos <= NPC_X_Init;
 				NPC_Y_Pos <= NPC_Y_Init;
 				NPC_X_Incr <= 10'd0;
@@ -66,6 +73,8 @@ module npc (input						Clk,                // 50 MHz clock
 			end
 		else
 			begin
+				//if(hit)
+				//Curr_Health <= Curr_Health + (~NPC_X_Step) + 1'b1;
 				NPC_X_Pos <= NPC_X_Pos_in;
 				NPC_Y_Pos <= NPC_Y_Pos_in;
 				NPC_X_Incr <= NPC_X_Incr_in;

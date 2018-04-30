@@ -1,20 +1,20 @@
 module hitbox(	input [9:0]		Obj_X,
 										Obj_Y,
+										
 										Target_X,
 										Target_Y,
-										Coverage,
+										
+										Target_X_Size,
+										Target_Y_Size,
+										
 					output logic	contact
 					);
-					
-	/* Since the multiplicants are required to be signed, we have to first cast them
-	from logic to int (signed by default) before they are multiplied. */
-	int DistX, DistY, Size;
-	assign DistX = Target_X - Obj_X;
-	assign DistY = Target_Y - Obj_Y;
-	assign Size = Coverage;
+
+	// assuming Target_X and Target_Y are top left pixel_Y;
 	always_comb begin
 		// function only works with circles/ovals
-		if ( ( DistX*DistX + DistY*DistY) <= (Size*Size) )
+		if(Obj_X >= Target_X && Obj_X < Target_X + Target_X_Size &&
+			Obj_Y >= Target_Y && Obj_Y < Target_Y + Target_Y_Size)
 			contact = 1'b1;
 		else
 			contact = 1'b0;

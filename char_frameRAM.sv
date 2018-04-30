@@ -43,20 +43,19 @@ module char_frameRAM(input [11:0]				Player_address,
 		// retrieve index for color palette
 		Player_LUT_idx = mem[Player_address];
 		// different colors for players
+		NPC_LUT_idx = mem[NPC_address];
 		if(NPC_LUT_idx == 4'd2) // robe
 			NPC_LUT_idx = 4'd12;
 		else if(NPC_LUT_idx == 4'd12) // medalion
 			NPC_LUT_idx = 4'd2;
-		else
-			NPC_LUT_idx = mem[NPC_address];
 		
 		// white or non-white
-		if(Player_LUT_idx == 4'd1)
+		if(Player_LUT_idx == 4'd0)
 			player_pixel_on = 1'b0;
 		else
 			player_pixel_on = 1'b1;
 		
-		if(NPC_LUT_idx == 4'd1)
+		if(NPC_LUT_idx == 4'd0)
 			npc_pixel_on = 1'b0;
 		else
 			npc_pixel_on = 1'b1;

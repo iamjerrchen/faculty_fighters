@@ -132,8 +132,18 @@ module faculty_fighter_top_level(
 	 parameter NPC_Y_Init = 10'd355;
 	 parameter Proj_X_Speed = 10'd4;
 	 
-	 logic [9:0] Player_X_Size, NPC_X_Size;
+	 logic [4:0] is_player_health, is_npc_health;
+	 parameter Player_Health_X = 10'd10;
+	 parameter Player_Health_Y = 10'd10;
+	 parameter NPC_Health_X = 10'd539; // 639 - (5*4 + 5*16)
+	 parameter NPC_Health_Y = 10'd10;
+	 
+	 logic [9:0] Player_X_Size, Player_Y_Size, NPC_X_Size, NPC_Y_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr, Proj_X_curr, Proj_Y_curr;
+	 logic [9:0] Player_X_curr_center, Player_Y_curr_center;
+	 
+	 assign Player_X_curr_center = Player_X_curr + 10'd21;
+	 assign Player_Y_curr_center = Player_Y_curr + 10'd32;
 	 
 	 // Input Control
 	 logic Player_Up, Player_Right, Player_Left, NPC_Right, NPC_Left;
@@ -171,8 +181,8 @@ module faculty_fighter_top_level(
 	 projectile bullet(.Clk(Clk),
 							.Reset(Reset_h || Soft_Reset_h),
 							.frame_clk(VGA_VS),
-							.Proj_X_Center(Player_X_curr), // Shooter's Center
-							.Proj_Y_Center(Player_Y_curr),
+							.Proj_X_Center(Player_X_curr_center), // Shooter's Center
+							.Proj_Y_Center(Player_Y_curr_center),
 							.Proj_X_Step(Proj_X_Speed),
 							
 							.Proj_X_Curr_Pos(Proj_X_curr),
@@ -189,7 +199,8 @@ module faculty_fighter_top_level(
 							.Obj_Y(Proj_Y_curr),
 							.Target_X(NPC_X_curr),
 							.Target_Y(NPC_Y_curr),
-							.Coverage(NPC_X_Size),
+							.Target_X_Size(NPC_X_Size),
+							.Target_Y_Size(NPC_Y_Size),
 							.contact(bullet_contact));
 												
     // Which signal should be frame_clk? VGA_VS
@@ -202,6 +213,7 @@ module faculty_fighter_top_level(
 								.Player_X_Curr_Pos(Player_X_curr),
 								.Player_Y_Curr_Pos(Player_Y_curr),
 								.Player_X_Size(Player_X_Size),
+								.Player_Y_Size(Player_Y_Size),
 								.Enemy_X_Curr_Pos(NPC_X_curr),
 								.Enemy_Y_Curr_Pos(NPC_Y_curr),
 								.Enemy_X_Size(NPC_X_Size),
@@ -227,6 +239,7 @@ module faculty_fighter_top_level(
 								.NPC_X_Curr_Pos(NPC_X_curr),
 								.NPC_Y_Curr_Pos(NPC_Y_curr),
 								.NPC_X_Size(NPC_X_Size),
+								.NPC_Y_Size(NPC_Y_Size),
 								.Enemy_X_Curr_Pos(Player_X_curr),
 								.Enemy_Y_Curr_Pos(Player_Y_curr),
 								.Enemy_X_Size(Player_X_Size),
@@ -243,19 +256,34 @@ module faculty_fighter_top_level(
 								.NPC_RAM_addr(NPC_RAM_addr),
 								.is_npc(is_npc));
 	 
-	 // coloring for character
-	 char_frameRAM colors(.Player_address(Player_RAM_addr),
+	// coloring for character
+	char_frameRAM colors(.Player_address(Player_RAM_addr),
 								.NPC_address(NPC_RAM_addr),
 								.sprite_size_x(sprite_size_x),
 								.player_pixel_on(player_pixel_on),
 								.npc_pixel_on(npc_pixel_on),
 								.Player_pixel(player_pixel),
 								.NPC_pixel(npc_pixel));
-	 
-    color_mapper color_instance(	.Clk(Clk),
+								
+	health player_health(.DrawX(DrawX),
+						.DrawY(DrawY),
+						.Health_Pos_X(Player_Health_X),
+						.Health_Pos_Y(Player_Health_Y),
+						.is_health(is_player_health));
+
+	health npc_health(.DrawX(DrawX),
+						.DrawY(DrawY),
+						.Health_Pos_X(NPC_Health_X),
+						.Health_Pos_Y(NPC_Health_Y),
+						.is_health(is_npc_health));	
+					
+	color_mapper color_instance(	.Clk(Clk),
 											.is_player(is_player),
 											.is_npc(is_npc),
 											.is_proj(is_proj),
+											.is_player_health(is_player_health),
+											.is_npc_health(is_npc_health),
+											
 											// stage
 											.start_l(start_l),
 											.battle_l(battle_l),
