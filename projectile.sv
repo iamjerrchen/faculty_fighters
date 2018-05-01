@@ -1,6 +1,9 @@
 module projectile(input						Clk,
 													Reset,
 													frame_clk,
+													
+													player_or_npc,
+													
 						input [9:0]				Proj_X_Center,			// Shooter's Center
 													Proj_Y_Center,
 													Proj_X_Step,
@@ -11,7 +14,9 @@ module projectile(input						Clk,
 						input						activate, contact,
 						
 						input	[9:0]				DrawX, DrawY,			// Current pixel coordinates
-						output logic			is_proj					// Whether pixel belongs to projectile or other
+						output logic			is_proj,					// Whether pixel belongs to projectile or other
+						
+						output logic [23:0]	fire_pixel
 						);
 						
 	// Constants
@@ -19,7 +24,6 @@ module projectile(input						Clk,
 	parameter [9:0] Proj_X_Max = 10'd639;     // Rightmost point on the X axis
 	parameter [9:0] Proj_Y_Min = 10'd340;     // Topmost point on the Y axis
 	parameter [9:0] Proj_Y_Max = 10'd381;     // Bottommost point on the Y axis
-	parameter [9:0] Proj_Size = 10'd4;        // Projectile size
 	
 	logic [9:0] Proj_X_Pos, Proj_X_Motion, Proj_Y_Pos;
 	logic [9:0] Proj_X_Pos_in, Proj_X_Motion_in, Proj_Y_Pos_in;
@@ -85,7 +89,7 @@ module projectile(input						Clk,
 					end
 					
 				// contact with target
- 				if (contact || (Proj_X_Pos >= Proj_X_Max + Proj_Size))
+ 				if (contact || (Proj_X_Pos >= Proj_X_Max + sprite_x_size))
 					begin
 						// Stay fixed to shooter
 						is_active_in = 1'd0;
@@ -99,8 +103,41 @@ module projectile(input						Clk,
 		end
 	end
 	
+	////////////////////////////////////////////////////////////////////
+	logic [9:0] sprite_x_size, sprite_y_size;
+	logic fire_pixel_on;
+	fireball_sprite fireball_colors(.frame_clk(frame_clk),
+												.Reset(Reset),
+												.player_or_npc(player_or_npc), // passed in
+												.DrawX(DrawX),
+												.DrawY(DrawY),
+												.proj_x_curr(Proj_X_Pos),
+												.proj_y_curr(Proj_Y_Pos),
+												
+												.fire_active(is_active),
+												
+												.sprite_size_x(sprite_x_size),
+												.sprite_size_y(sprite_y_size),
+												.fire_pixel_on(fire_pixel_on),
+												.fire_pixel(fire_pixel)												
+												);
+	
+	always_comb
+	begin
+		if(is_active && fire_pixel_on)
+		begin
+			if(DrawX >= Proj_X_Pos && DrawX < Proj_X_Pos + sprite_x_size &&
+				DrawY >= Proj_Y_Pos && DrawY < Proj_Y_Pos + sprite_y_size)
+				is_proj = 1'b1;
+			else
+				is_proj = 1'b0;
+			end
+		else
+			is_proj = 1'b0;
+	end
+	////////////////////////////////////////////////////////////////////
 	// Logic for mapping proj to screen
-	int DistX, DistY, Size;
+	/*int DistX, DistY, Size;
 	assign DistX = DrawX - Proj_X_Pos;
 	assign DistY = DrawY - Proj_Y_Pos;
 	assign Size = Proj_Size;
@@ -114,5 +151,5 @@ module projectile(input						Clk,
 				end
 			else
             is_proj = 1'b0;
-	end					
+	end*/					
 endmodule

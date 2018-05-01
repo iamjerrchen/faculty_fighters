@@ -130,22 +130,20 @@ module faculty_fighter_top_level(
 	 parameter Player_Y_Init = 10'd355;
 	 parameter NPC_X_Init = 10'd360;
 	 parameter NPC_Y_Init = 10'd355;
-	 parameter Players_Proj_X_Speed = 10'd4;
-	 parameter NPCs_Proj_X_Speed = ~(10'd4) + 1'b1;
+	 parameter Players_Proj_X_Speed = 10'd1;
+	 parameter NPCs_Proj_X_Speed = ~(10'd1) + 1'b1;
 	 
 	 logic [4:0] is_player_health, is_npc_health;
-	 parameter Player_Health_X = 10'd10;
-	 parameter Player_Health_Y = 10'd26;
 	 
 	 logic [9:0] Player_X_Size, Player_Y_Size, NPC_X_Size, NPC_Y_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr;
 	 logic [9:0] Players_Proj_X_curr, Players_Proj_Y_curr, NPCs_Proj_X_curr, NPCs_Proj_Y_curr;
 	 logic [9:0] Player_X_curr_center, Player_Y_curr_center, NPC_X_curr_center, NPC_Y_curr_center;
 	 
-	 assign Player_X_curr_center = Player_X_curr + 10'd21;
-	 assign Player_Y_curr_center = Player_Y_curr + 10'd32;
-	 assign NPC_X_curr_center = NPC_X_curr + 10'd21;
-	 assign NPC_Y_curr_center = NPC_Y_curr + 10'd32;
+	 assign Player_X_curr_center = Player_X_curr + 10'd25;
+	 assign Player_Y_curr_center = Player_Y_curr + 10'd24;
+	 assign NPC_X_curr_center = NPC_X_curr + 10'd16;
+	 assign NPC_Y_curr_center = NPC_Y_curr + 10'd24;
 	 
 	 // Input Control
 	 logic Player_Up, Player_Right, Player_Left, NPC_Right, NPC_Left, NPC_Up;
@@ -160,7 +158,6 @@ module faculty_fighter_top_level(
 	 
 	 // temporary
 	 logic Player_Dead, NPC_Dead;
-	 assign Player_Dead = SW[10];
 	 
 	 // state output
 	 logic start_l, battle_l, win_l, lose_l;
@@ -179,10 +176,12 @@ module faculty_fighter_top_level(
 								.lose_l(lose_l)
 								);
 	 
+	 logic [23:0] player_fire_pixel, npc_fire_pixel;
 	 // projectile belongs to player
 	 projectile players_bullet(.Clk(Clk),
 							.Reset(Reset_h || Soft_Reset_h),
 							.frame_clk(VGA_VS),
+							.player_or_npc(1'b0),
 							.Proj_X_Center(Player_X_curr_center), // Shooter's Center
 							.Proj_Y_Center(Player_Y_curr_center),
 							.Proj_X_Step(Players_Proj_X_Speed),
@@ -194,7 +193,8 @@ module faculty_fighter_top_level(
 							.contact(bullet_npc_contact),
 							.DrawX(DrawX),
 							.DrawY(DrawY),		// Current pixel coordinates
-							.is_proj(is_player_proj)			// Whether pixel belongs to projectile or other
+							.is_proj(is_player_proj),			// Whether pixel belongs to projectile or other
+							.fire_pixel(player_fire_pixel)
 							);
 							
 	 // Bullet VS NPC
@@ -210,6 +210,7 @@ module faculty_fighter_top_level(
 	 projectile npcs_bullet(.Clk(Clk),
 							.Reset(Reset_h || Soft_Reset_h),
 							.frame_clk(VGA_VS),
+							.player_or_npc(1'b1),
 							.Proj_X_Center(NPC_X_curr_center), // Shooter's Center
 							.Proj_Y_Center(NPC_Y_curr_center),
 							.Proj_X_Step(NPCs_Proj_X_Speed),
@@ -221,7 +222,8 @@ module faculty_fighter_top_level(
 							.contact(bullet_player_contact),
 							.DrawX(DrawX),
 							.DrawY(DrawY),		// Current pixel coordinates
-							.is_proj(is_npc_proj)			// Whether pixel belongs to projectile or other
+							.is_proj(is_npc_proj),			// Whether pixel belongs to projectile or other
+							.fire_pixel(npc_fire_pixel)
 							);
 							
 	 // Bullet VS Player
@@ -251,14 +253,21 @@ module faculty_fighter_top_level(
 								.Up(Player_Up),
 								.Left(Player_Left),
 								.Right(Player_Right),
+								//.contact(bullet_player_contact),
 								
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
 								
 								.sprite_size_x(sprite_size_x),
+								.is_player_health(is_player_health),
 								.Player_RAM_addr(Player_RAM_addr),
-								.is_player(is_player));
+								.is_player(is_player),
+								.is_dead(Player_Dead),
+								// projectile logic
+								.NPCs_Proj_X_curr(NPCs_Proj_X_curr),
+								.NPCs_Proj_Y_curr(NPCs_Proj_Y_curr),
+								.bullet_player_contact(bullet_player_contact));
 								
 	 npc npc_instance(.Clk(Clk),
 								.Reset(Reset_h || Soft_Reset_h),
@@ -288,27 +297,26 @@ module faculty_fighter_top_level(
 								.NPC_RAM_addr(NPC_RAM_addr),
 								.is_npc(is_npc),
 								.is_dead(NPC_Dead));
-	 
+	
 	// coloring for character
-	char_frameRAM colors(.Player_address(Player_RAM_addr),
+	char_frameRAM char_colors(.Player_address(Player_RAM_addr),
 								.NPC_address(NPC_RAM_addr),
 								.sprite_size_x(sprite_size_x),
 								.player_pixel_on(player_pixel_on),
 								.npc_pixel_on(npc_pixel_on),
 								.Player_pixel(player_pixel),
 								.NPC_pixel(npc_pixel));
-								
-	health player_health(.DrawX(DrawX),
-						.DrawY(DrawY),
-						.Health_Pos_X(Player_Health_X),
-						.Health_Pos_Y(Player_Health_Y),
-						.is_health(is_player_health));
-					
+
+	// Pixel Drawer				
 	color_mapper color_instance(	.Clk(Clk),
 											.is_player(is_player),
 											.is_npc(is_npc),
+											
 											.is_player_proj(is_player_proj),
+											.player_fire_pixel(player_fire_pixel),
 											.is_npc_proj(is_npc_proj),
+											.npc_fire_pixel(npc_fire_pixel),
+											
 											.is_player_health(is_player_health),
 											.is_npc_health(is_npc_health),
 											

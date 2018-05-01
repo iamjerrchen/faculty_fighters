@@ -18,8 +18,11 @@
 module  color_mapper (	input					Clk,
 								input             is_player,            // Whether current pixel belongs to ball 
 														is_npc,
+														
 														is_player_proj,
-														is_npc_proj,
+														is_npc_proj,		
+								input [23:0]		player_fire_pixel,
+														npc_fire_pixel,
 														
 								input [4:0]			is_player_health,
 														is_npc_health,
@@ -178,15 +181,15 @@ module  color_mapper (	input					Clk,
 			// projectiles
 			else if (is_player_proj == 1'b1)
 			begin
-				Red = 8'hff;
-				Green = 8'h00;
-				Blue = 8'h00;
+				Red = player_fire_pixel[23:16];
+				Green = player_fire_pixel[15:8];
+				Blue = player_fire_pixel[7:0];
 			end
 			else if (is_npc_proj == 1'b1)
 			begin
-				Red = 8'hff;
-				Green = 8'h00;
-				Blue = 8'hff;
+				Red = npc_fire_pixel[23:16];
+				Green = npc_fire_pixel[15:8];
+				Blue = npc_fire_pixel[7:0];
 			end
 			// end projectiles
 			
@@ -201,13 +204,13 @@ module  color_mapper (	input					Clk,
 			// end health bar
 			
 			// Text
-			else if((is_player_text == 1'b1) && (font_bitmap[7 - DrawX - player_text_x_start] == 1'b1))
+			else if((is_player_text == 1'b1) && (font_bitmap[7 - (DrawX - player_text_x_start)] == 1'b1))
 			begin
 				Red = 8'd108;
 				Green = 8'd108;
 				Blue = 8'd108;
 			end
-			else if((is_npc_text == 1'b1) && (font_bitmap[7 - DrawX - npc_text_x_start] == 1'b1))
+			else if((is_npc_text == 1'b1) && (font_bitmap[7 - (DrawX - npc_text_x_start)] == 1'b1))
 			begin
 				Red = 8'd108;
 				Green = 8'd108;

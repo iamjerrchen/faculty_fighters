@@ -19,7 +19,7 @@ module stage_control (
 							);
 
 	// Declare signals curr_state, next_state of type enum
-	enum logic [1:0] {START, BATTLE, WIN, LOSE}	curr_state, next_state; 
+	enum logic [2:0] {START, BATTLE, WIN, LOSE, END}	curr_state, next_state; 
 
 	// Updates flip flop, current state is the only one
 	always_ff @ (posedge Clk)  
@@ -46,10 +46,13 @@ module stage_control (
 								
 				// Stay in state til released
 				WIN:		if(~NPC_Dead)
-								next_state = START;
+								next_state = END;
 				LOSE:		if(~Player_Dead)
+								next_state = END;
+				
+				// Transition state
+				END:		if(~Fight)
 								next_state = START;
-								
 			endcase
 			
 			
@@ -77,6 +80,14 @@ module stage_control (
 						battle_l = 1'b0;
 						win_l = 1'b0;
 						lose_l = 1'b1;
+					end
+					
+				END:
+					begin
+						start_l = 1'b1;
+						battle_l = 1'b0;
+						win_l = 1'b0;
+						lose_l = 1'b0;
 					end
 					
 				default: // default in battle state

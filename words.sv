@@ -214,11 +214,11 @@ module word_npc(input [9:0] 			DrawX,
 	always_comb
 	begin
 		if(DrawX-word_x_start < 9'd8)
-			n = 9'h17; // n
+			n = 9'h17; // N
 		else if(DrawX-word_x_start < 9'd16)
-			n = 9'h19; // p
+			n = 9'h19; // P
 		else
-			n = 9'h0c; // c
+			n = 9'h0c; // C
 	end
 	
 	always_comb

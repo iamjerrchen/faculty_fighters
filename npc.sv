@@ -34,7 +34,7 @@ module npc (input						Clk,                // 50 MHz clock
 	parameter [9:0] NPC_Y_Min = 10'd290;     // Topmost point on the Y axis
 	parameter [9:0] NPC_Y_Max = 10'd420;     // Bottommost point on the Y axis
 	parameter [9:0] NPC_X_Step = 10'd1;      // Step size on the X axis
-	parameter [9:0] NPC_Y_Step = 10'd1;      // Step size on the Y axis
+	parameter [9:0] NPC_Y_Step = 10'd2;      // Step size on the Y axis
 	parameter [9:0] NPC_Size_X = 41; 
 	parameter [9:0] NPC_Size_Y = 64; // 65
 	
@@ -70,7 +70,7 @@ module npc (input						Clk,                // 50 MHz clock
 	begin
 		if (Reset)
 			begin
-				Curr_Health <= 5'd5;
+				Curr_Health <= 4'd5;
 				NPC_X_Pos <= NPC_X_Init;
 				NPC_Y_Pos <= NPC_Y_Init;
 				NPC_X_Incr <= 10'd0;
@@ -95,7 +95,7 @@ module npc (input						Clk,                // 50 MHz clock
 					triggered <= 1'b0;
 				end
 				
-				if(Curr_Health == 3'd0)
+				if(Curr_Health == 4'd0)
 					is_dead <= 1'b1;
 				
 				is_npc_health <= npc_health_block & npc_health_in;
@@ -144,11 +144,6 @@ module npc (input						Clk,                // 50 MHz clock
 				else if(Left)//keycode == 8'h50) // A (left)
 					begin
 						NPC_X_Incr_in = ~(NPC_X_Step) + 1'b1;
-						NPC_Y_Incr_in = 1'b0;
-					end
-				else if(keycode == 8'h51) // S (down)
-					begin
-						NPC_X_Incr_in = 1'b0;
 						NPC_Y_Incr_in = 1'b0;
 					end
 				else if(Right)//keycode == 8'h4f) // D (right)
