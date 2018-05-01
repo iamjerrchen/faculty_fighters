@@ -135,7 +135,7 @@ module faculty_fighter_top_level(
 	 
 	 logic [4:0] is_player_health, is_npc_health;
 	 parameter Player_Health_X = 10'd10;
-	 parameter Player_Health_Y = 10'd10;
+	 parameter Player_Health_Y = 10'd26;
 	 
 	 logic [9:0] Player_X_Size, Player_Y_Size, NPC_X_Size, NPC_Y_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr;

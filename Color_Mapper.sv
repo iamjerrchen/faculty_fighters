@@ -53,7 +53,9 @@ module  color_mapper (	input					Clk,
 	logic [9:0] FIGHT_x_start, FIGHT_y_start, FIGHT_n;
 	logic [9:0] DEFEAT_x_start, DEFEAT_y_start, DEFEAT_n;
 	logic [9:0] VICTORY_x_start, VICTORY_y_start, VICTORY_n;
-	logic is_FIGHT, is_DEFEAT, is_VICTORY;
+	logic [9:0] player_text_x_start, player_text_y_start, player_text_n;
+	logic [9:0] npc_text_x_start, npc_text_y_start, npc_text_n;
+	logic is_FIGHT, is_DEFEAT, is_VICTORY, is_player_text, is_npc_text;
 	
 	font_rom font_color_data(.addr(font_addr),
 				.data(font_bitmap)
@@ -84,6 +86,16 @@ module  color_mapper (	input					Clk,
 		begin
 			FONT_y_start = VICTORY_y_start;
 			n = VICTORY_n;
+		end
+		else if(is_player_text == 1'b1)
+		begin
+			FONT_y_start = player_text_y_start;
+			n = player_text_n;
+		end
+		else if(is_npc_text == 1'b1)
+		begin
+			FONT_y_start = npc_text_y_start;
+			n = npc_text_n;
 		end
 		else
 		begin
@@ -146,7 +158,7 @@ module  color_mapper (	input					Clk,
 			end
 		end // end lose_l
 		/* --------------------------------------------------------------------------- */
-		else //if(game_l)
+		else //if(battle_l)
 		begin
 			// characters
 			if (is_player == 1'b1 && player_pixel_on == 1'b1) 
@@ -188,6 +200,20 @@ module  color_mapper (	input					Clk,
 			end
 			// end health bar
 			
+			// Text
+			else if((is_player_text == 1'b1) && (font_bitmap[7 - DrawX - player_text_x_start] == 1'b1))
+			begin
+				Red = 8'd108;
+				Green = 8'd108;
+				Blue = 8'd108;
+			end
+			else if((is_npc_text == 1'b1) && (font_bitmap[7 - DrawX - npc_text_x_start] == 1'b1))
+			begin
+				Red = 8'd108;
+				Green = 8'd108;
+				Blue = 8'd108;
+			end
+			
 			else // background
 			begin
 				// Background with nice color gradient
@@ -195,7 +221,7 @@ module  color_mapper (	input					Clk,
 				Green = backgroundRAM_data[15:8];
 				Blue = backgroundRAM_data[7:0];
 			end // end_background
-		end // end game_l
+		end // end battle_l
 	end // end always_comb
 	
 	// Word Logic
@@ -228,5 +254,21 @@ module  color_mapper (	input					Clk,
 					.n(VICTORY_n),
 					.is_word(is_VICTORY)
 					);
+					
+	word_player player_text_data(.DrawX(DrawX),
+					.DrawY(DrawY),
+					.active(battle_l),
+					.start_x(player_text_x_start),
+					.start_y(player_text_y_start),
+					.n(player_text_n),
+					.is_word(is_player_text));
+					
+	word_npc npc_text_data(.DrawX(DrawX),
+					.DrawY(DrawY),
+					.active(battle_l),
+					.start_x(npc_text_x_start),
+					.start_y(npc_text_y_start),
+					.n(npc_text_n),
+					.is_word(is_npc_text));
  
 endmodule

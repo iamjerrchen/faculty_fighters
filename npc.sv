@@ -38,8 +38,8 @@ module npc (input						Clk,                // 50 MHz clock
 	parameter [9:0] NPC_Size_X = 41; 
 	parameter [9:0] NPC_Size_Y = 64; // 65
 	
-	parameter NPC_Health_X = 10'd539; // 639 - (5*4 + 5*16)
-	parameter NPC_Health_Y = 10'd10;
+	parameter NPC_Health_X = 10'd538; // 639 - (5*4 + 5*16)
+	parameter NPC_Health_Y = 10'd26;
 	
 	logic triggered, hit;
 	logic [4:0] npc_health, npc_health_in;	// logic
