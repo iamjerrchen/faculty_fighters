@@ -30,7 +30,7 @@ void IO_write(alt_u8 Address, alt_u16 Data)
 
 	*otg_hpi_cs = 0; // select the chip
 	*otg_hpi_w = 0; // Tell hpi to write
-	usleep(2000); // wait for it to finish
+	usleep(500); // wait for it to finish
 
 	*otg_hpi_w = 1; // turn off write operation
 	*otg_hpi_cs = 1; // unselect chip
@@ -49,7 +49,7 @@ alt_u16 IO_read(alt_u8 Address)
 
 	*otg_hpi_cs = 0; // select chip
 	*otg_hpi_r = 0; // tell hpi to read from address provided, fill hpi_data
-	usleep(2000); // wait for operation to finish
+	usleep(500); // wait for operation to finish
 	temp = *otg_hpi_data;
 	*otg_hpi_r = 1; // turn off read operation
 	*otg_hpi_cs = 1; // unselect chip

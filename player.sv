@@ -153,18 +153,18 @@ module player (input						Clk,						// 50 MHz clock
 		if (frame_clk_rising_edge)
 			begin
 				// Keypress logic
-				if(Up && (Player_Y_Motion != 1'b1))//keycode == 8'd26) // W (up)
+				if(keycode == 8'd26 && (Player_Y_Motion == 1'b0))// Up) // W (up)
 					begin
 						Player_X_Incr_in = 1'b0;
 						Player_Y_Incr_in = 1'b0;
 						Player_Y_Motion_in = ~(Player_Y_Step) + 1'b1;
 					end
-				else if(Left)//keycode == 8'd4) // A (left)
+				else if(keycode == 8'd4)//Left) // A (left)
 					begin
 						Player_X_Incr_in = ~(Player_X_Step) + 1'b1;
 						Player_Y_Incr_in = 1'b0;
 					end
-				else if(Right)//keycode == 8'd7) // D (right)
+				else if(keycode == 8'd7)//Right) // D (right)
 					begin
 						Player_X_Incr_in = Player_X_Step;
 						Player_Y_Incr_in = 1'b0;

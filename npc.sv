@@ -135,7 +135,7 @@ module npc (input						Clk,                // 50 MHz clock
 		if (frame_clk_rising_edge)
 			begin
 				// Keypress logic
-				if(Up && (NPC_Y_Motion != 1'b1))//keycode == 8'h52) // W (up)
+				if(Up && (NPC_Y_Motion == 1'b0))//keycode == 8'h52) // W (up)
 					begin
 						NPC_X_Incr_in = 1'b0;
 						NPC_Y_Incr_in = 1'b0;
