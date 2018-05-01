@@ -35,7 +35,7 @@ module player (input						Clk,						// 50 MHz clock
 	// constants
 	parameter [9:0] Player_X_Min = 10'd0;       // Leftmost point on the X axis
 	//parameter [9:0] Player_X_Max = 10'd639;   // Rightmost point on the X axis
-	parameter [9:0] Player_Y_Min = 10'd290;     // Topmost point on the Y axis
+	parameter [9:0] Player_Y_Min = 10'd280;     // Topmost point on the Y axis
 	parameter [9:0] Player_Y_Max = 10'd420;     // Bottommost point on the Y axis
 	parameter [9:0] Player_X_Step = 10'd1;      // Step size on the X axis
 	parameter [9:0] Player_Y_Step = 10'd2;      // Step size on the Y axis
