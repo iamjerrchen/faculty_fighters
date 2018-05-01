@@ -117,7 +117,7 @@ module npc (input						Clk,                // 50 MHz clock
 		// so npc_health_in will not decrement indefinitely
 		npc_health_in = npc_health;
 		if(triggered && hit)
-			npc_health_in = npc_health + ~(NPC_X_Step) + 1'b1;
+			npc_health_in = npc_health >> 1;
 	end
 	
 	// You need to modify always_comb block.

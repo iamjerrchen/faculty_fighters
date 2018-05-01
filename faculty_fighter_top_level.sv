@@ -38,7 +38,7 @@ module faculty_fighter_top_level(
     
     logic Reset_h, Clk;
     logic [7:0] keycode;
-	 logic Shoot_h;
+	 logic player_shoot_h, npc_shoot_h;
     
 	 // synchronizer
     assign Clk = CLOCK_50;
@@ -46,8 +46,8 @@ module faculty_fighter_top_level(
         Reset_h <= ~(KEY[0]);        // The push buttons are active low
 		  Soft_Reset_h <= ~(KEY[3]);
 		  // temporary
-		  Shoot_h <= ~(KEY[2]);
-		  NPC_Up_h <= ~(KEY[1]);
+		  player_shoot_h <= ~(KEY[2]);
+		  npc_shoot_h <= ~(KEY[1]);
     end
     
     logic [1:0] hpi_addr;
@@ -117,9 +117,9 @@ module faculty_fighter_top_level(
 	 
 	 ////////// ADD STUFF HERE ///////////
 	 
-	 logic is_player, is_npc, is_proj;
+	 logic is_player, is_npc, is_player_proj;
 	 logic player_pixel_on, npc_pixel_on;
-	 logic bullet_contact;
+	 logic bullet_npc_contact;
 	 
 	 logic [23:0] player_pixel, npc_pixel;
 	 logic [11:0] Player_RAM_addr, NPC_RAM_addr;
@@ -130,27 +130,29 @@ module faculty_fighter_top_level(
 	 parameter Player_Y_Init = 10'd355;
 	 parameter NPC_X_Init = 10'd360;
 	 parameter NPC_Y_Init = 10'd355;
-	 parameter Proj_X_Speed = 10'd4;
+	 parameter Players_Proj_X_Speed = 10'd4;
 	 
 	 logic [4:0] is_player_health, is_npc_health;
 	 parameter Player_Health_X = 10'd10;
 	 parameter Player_Health_Y = 10'd10;
 	 
 	 logic [9:0] Player_X_Size, Player_Y_Size, NPC_X_Size, NPC_Y_Size;
-	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr, Proj_X_curr, Proj_Y_curr;
+	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr;
+	 logic [9:0] Players_Proj_X_curr, Players_Proj_Y_curr;
 	 logic [9:0] Player_X_curr_center, Player_Y_curr_center;
 	 
 	 assign Player_X_curr_center = Player_X_curr + 10'd21;
 	 assign Player_Y_curr_center = Player_Y_curr + 10'd32;
 	 
 	 // Input Control
-	 logic Player_Up, Player_Right, Player_Left, NPC_Right, NPC_Left;
+	 logic Player_Up, Player_Right, Player_Left, NPC_Right, NPC_Left, NPC_Up;
 	 logic Restart;
 	 assign Player_Up = SW[13];
 	 assign Player_Right = SW[14];
 	 assign Player_Left = SW[15];
 	 assign NPC_Right = SW[0];
 	 assign NPC_Left = SW[1];
+	 assign NPC_Up = SW[2];
 	 assign Restart = SW[11];
 	 
 	 // temporary
@@ -175,30 +177,30 @@ module faculty_fighter_top_level(
 								);
 	 
 	 // projectile belongs to player
-	 projectile bullet(.Clk(Clk),
+	 projectile players_bullet(.Clk(Clk),
 							.Reset(Reset_h || Soft_Reset_h),
 							.frame_clk(VGA_VS),
 							.Proj_X_Center(Player_X_curr_center), // Shooter's Center
 							.Proj_Y_Center(Player_Y_curr_center),
-							.Proj_X_Step(Proj_X_Speed),
+							.Proj_X_Step(Players_Proj_X_Speed),
 							
-							.Proj_X_Curr_Pos(Proj_X_curr),
-							.Proj_Y_Curr_Pos(Proj_Y_curr),
+							.Proj_X_Curr_Pos(Players_Proj_X_curr),
+							.Proj_Y_Curr_Pos(Players_Proj_Y_curr),
 							
-							.activate(Shoot_h),
-							.contact(bullet_contact),
+							.activate(player_shoot_h),
+							.contact(bullet_npc_contact),
 							.DrawX(DrawX),
 							.DrawY(DrawY),		// Current pixel coordinates
-							.is_proj(is_proj)			// Whether pixel belongs to projectile or other
+							.is_proj(is_player_proj)			// Whether pixel belongs to projectile or other
 							);
 							
-	 hitbox bullet_npc(.Obj_X(Proj_X_curr),
-							.Obj_Y(Proj_Y_curr),
+	 hitbox bullet_npc(.Obj_X(Players_Proj_X_curr),
+							.Obj_Y(Players_Proj_Y_curr),
 							.Target_X(NPC_X_curr),
 							.Target_Y(NPC_Y_curr),
 							.Target_X_Size(NPC_X_Size),
 							.Target_Y_Size(NPC_Y_Size),
-							.contact(bullet_contact));
+							.contact(bullet_npc_contact));
 												
     // Which signal should be frame_clk? VGA_VS
     player player_instance(.Clk(Clk),
@@ -241,10 +243,10 @@ module faculty_fighter_top_level(
 								.Enemy_Y_Curr_Pos(Player_Y_curr),
 								.Enemy_X_Size(Player_X_Size),
 								// controls
-								.Up(NPC_Up_h),
+								.Up(NPC_Up),
 								.Left(NPC_Left),
 								.Right(NPC_Right),
-								.contact(bullet_contact),
+								.contact(bullet_npc_contact),
 								
 								.keycode(keycode),
 								.DrawX(DrawX),
@@ -269,12 +271,12 @@ module faculty_fighter_top_level(
 						.DrawY(DrawY),
 						.Health_Pos_X(Player_Health_X),
 						.Health_Pos_Y(Player_Health_Y),
-						.is_health(is_player_health));	
+						.is_health(is_player_health));
 					
 	color_mapper color_instance(	.Clk(Clk),
 											.is_player(is_player),
 											.is_npc(is_npc),
-											.is_proj(is_proj),
+											.is_player_proj(is_player_proj),
 											.is_player_health(is_player_health),
 											.is_npc_health(is_npc_health),
 											

@@ -18,7 +18,8 @@
 module  color_mapper (	input					Clk,
 								input             is_player,            // Whether current pixel belongs to ball 
 														is_npc,
-														is_proj,
+														is_player_proj,
+														//is_npc_proj,
 														
 								input [4:0]			is_player_health,
 														is_npc_health,
@@ -160,13 +161,22 @@ module  color_mapper (	input					Clk,
 				Green = npc_pixel[15:8];
 				Blue = npc_pixel[7:0];
 			end
-			else if (is_proj == 1'b1)
+			// end characters
+			
+			// projectiles
+			else if (is_player_proj == 1'b1)
 			begin
 				Red = 8'hff;
 				Green = 8'h00;
 				Blue = 8'h00;
-			end
-			// end characters
+			end/*
+			else if (is_npc_proj == 1'b1)
+			begin
+				Red = 8'hff;
+				Green = 8'h00;
+				Blue = 8'hff;
+			end*/
+			// end projectiles
 			
 			// health bars, modify
 			else if (is_npc_health[0] || is_npc_health[1] || is_npc_health[2] || is_npc_health[3] || is_npc_health[4] ||

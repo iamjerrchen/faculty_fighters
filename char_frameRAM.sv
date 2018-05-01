@@ -24,7 +24,7 @@ module char_frameRAM(input [11:0]				Player_address,
 																24'h86652f,
 																24'he48322};
 	
-	logic [3:0] mem [0:2859]; // 44*65
+	logic [3:0] mem [0:2664]; // 41*65
 	
 	initial
 	begin
