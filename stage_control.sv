@@ -39,7 +39,7 @@ module stage_control (
 			
 				START:	if(Fight)
 								next_state = BATTLE;
-				BATTLE:		if(NPC_Dead)
+				BATTLE:	if(NPC_Dead)
 								next_state = WIN;
 							else if(Player_Dead)
 								next_state = LOSE;

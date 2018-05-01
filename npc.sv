@@ -15,15 +15,17 @@ module npc (input						Clk,                // 50 MHz clock
 											NPC_Y_Size,
 											
 				input						Up, Left, Right,
-				input						hit_in,	// hit by a projectile
+				input						contact,	// hit by a projectile
 				
 				input [7:0]				keycode,					// keycode exported form qsys
 				input [9:0]				DrawX, DrawY,			// Current pixel coordinates
 
 				input [9:0]				sprite_size_x,
+				
+				output logic [4:0]	is_npc_health,
 				output logic [11:0]	NPC_RAM_addr,
-				output logic			is_npc					// Whether current pixel belongs to ball or background
-											//is_alive
+				output logic			is_npc,					// Whether current pixel belongs to ball or background
+											is_dead
 				);
     
 	// constants
@@ -36,8 +38,13 @@ module npc (input						Clk,                // 50 MHz clock
 	parameter [9:0] NPC_Size_X = 41; 
 	parameter [9:0] NPC_Size_Y = 64; // 65
 	
-	logic hit;
-	logic [4:0]	Curr_Health;
+	parameter NPC_Health_X = 10'd539; // 639 - (5*4 + 5*16)
+	parameter NPC_Health_Y = 10'd10;
+	
+	logic triggered, hit;
+	logic [4:0] npc_health, npc_health_in;	// logic
+	logic [4:0] npc_health_block; // graphics
+	logic [3:0]	Curr_Health;
 	logic [9:0] NPC_X_Pos, NPC_X_Motion, NPC_Y_Pos, NPC_Y_Motion;
 	logic [9:0] NPC_X_Pos_in, NPC_X_Motion_in, NPC_Y_Pos_in, NPC_Y_Motion_in;
 	logic [9:0] NPC_X_Incr, NPC_Y_Incr, NPC_X_Incr_in, NPC_Y_Incr_in; // keystroke provides an increment amount
@@ -70,11 +77,31 @@ module npc (input						Clk,                // 50 MHz clock
 				NPC_Y_Incr <= 10'd0;
 				NPC_X_Motion <= 10'd0;
 				NPC_Y_Motion <= 10'd0;
+				triggered <= 1'b0;
+				is_dead <= 1'b0;
+				npc_health <= 5'b11111;
 			end
 		else
 			begin
-				//if(hit)
-				//Curr_Health <= Curr_Health + (~NPC_X_Step) + 1'b1;
+				// Health logic
+				if(hit && (triggered != 1'b1))
+				begin
+					Curr_Health <= Curr_Health + (~NPC_X_Step) + 1'b1;
+					triggered <= 1'b1;
+				end
+				else
+				begin
+					Curr_Health <= Curr_Health;
+					triggered <= 1'b0;
+				end
+				
+				if(Curr_Health == 3'd0)
+					is_dead <= 1'b1;
+				
+				is_npc_health <= npc_health_block & npc_health_in;
+				npc_health <= npc_health_in;
+				
+				// Position logic
 				NPC_X_Pos <= NPC_X_Pos_in;
 				NPC_Y_Pos <= NPC_Y_Pos_in;
 				NPC_X_Incr <= NPC_X_Incr_in;
@@ -82,6 +109,15 @@ module npc (input						Clk,                // 50 MHz clock
 				NPC_X_Motion <= NPC_X_Motion_in;
 				NPC_Y_Motion <= NPC_Y_Motion_in;
 			end
+	end
+	
+	always_comb
+	begin
+		// npc_health_in is controlled by synchronous npc_health wires
+		// so npc_health_in will not decrement indefinitely
+		npc_health_in = npc_health;
+		if(triggered && hit)
+			npc_health_in = npc_health + ~(NPC_X_Step) + 1'b1;
 	end
 	
 	// You need to modify always_comb block.
@@ -151,6 +187,18 @@ module npc (input						Clk,                // 50 MHz clock
 				NPC_Y_Pos_in = NPC_Y_Pos + NPC_Y_Motion + NPC_Y_Incr;
 			end
 	end
+	
+	health npc_healthbar(.DrawX(DrawX),
+						.DrawY(DrawY),
+						.Health_Pos_X(NPC_Health_X),
+						.Health_Pos_Y(NPC_Health_Y),
+						.is_health(npc_health_block));
+	
+	hit_once_control hit_logic(.Clk(Clk),
+										.Reset(Reset),
+										.contact(contact),
+										.triggered(triggered),
+										.hit(hit));
 	
 	// If current pixel is the character
 	always_comb

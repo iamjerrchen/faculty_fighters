@@ -135,8 +135,6 @@ module faculty_fighter_top_level(
 	 logic [4:0] is_player_health, is_npc_health;
 	 parameter Player_Health_X = 10'd10;
 	 parameter Player_Health_Y = 10'd10;
-	 parameter NPC_Health_X = 10'd539; // 639 - (5*4 + 5*16)
-	 parameter NPC_Health_Y = 10'd10;
 	 
 	 logic [9:0] Player_X_Size, Player_Y_Size, NPC_X_Size, NPC_Y_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr, Proj_X_curr, Proj_Y_curr;
@@ -158,7 +156,6 @@ module faculty_fighter_top_level(
 	 // temporary
 	 logic Player_Dead, NPC_Dead;
 	 assign Player_Dead = SW[10];
-	 assign NPC_Dead = SW[9];
 	 
 	 // state output
 	 logic start_l, battle_l, win_l, lose_l;
@@ -247,14 +244,17 @@ module faculty_fighter_top_level(
 								.Up(NPC_Up_h),
 								.Left(NPC_Left),
 								.Right(NPC_Right),
+								.contact(bullet_contact),
 								
 								.keycode(keycode),
 								.DrawX(DrawX),
 								.DrawY(DrawY),
 								
 								.sprite_size_x(sprite_size_x),
+								.is_npc_health(is_npc_health),
 								.NPC_RAM_addr(NPC_RAM_addr),
-								.is_npc(is_npc));
+								.is_npc(is_npc),
+								.is_dead(NPC_Dead));
 	 
 	// coloring for character
 	char_frameRAM colors(.Player_address(Player_RAM_addr),
@@ -269,13 +269,7 @@ module faculty_fighter_top_level(
 						.DrawY(DrawY),
 						.Health_Pos_X(Player_Health_X),
 						.Health_Pos_Y(Player_Health_Y),
-						.is_health(is_player_health));
-
-	health npc_health(.DrawX(DrawX),
-						.DrawY(DrawY),
-						.Health_Pos_X(NPC_Health_X),
-						.Health_Pos_Y(NPC_Health_Y),
-						.is_health(is_npc_health));	
+						.is_health(is_player_health));	
 					
 	color_mapper color_instance(	.Clk(Clk),
 											.is_player(is_player),
