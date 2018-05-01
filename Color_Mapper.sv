@@ -19,7 +19,7 @@ module  color_mapper (	input					Clk,
 								input             is_player,            // Whether current pixel belongs to ball 
 														is_npc,
 														is_player_proj,
-														//is_npc_proj,
+														is_npc_proj,
 														
 								input [4:0]			is_player_health,
 														is_npc_health,
@@ -55,12 +55,12 @@ module  color_mapper (	input					Clk,
 	logic [9:0] VICTORY_x_start, VICTORY_y_start, VICTORY_n;
 	logic is_FIGHT, is_DEFEAT, is_VICTORY;
 	
-	font_rom (.addr(font_addr),
+	font_rom font_color_data(.addr(font_addr),
 				.data(font_bitmap)
 				);
 				
 	logic [23:0] backgroundRAM_data;
-	background_frameRAM(.DrawX(DrawX),
+	background_frameRAM background_color_data(.DrawX(DrawX),
 								.DrawY(DrawY),
 								.Clk(Clk),
 								.data_out(backgroundRAM_data)
@@ -169,13 +169,13 @@ module  color_mapper (	input					Clk,
 				Red = 8'hff;
 				Green = 8'h00;
 				Blue = 8'h00;
-			end/*
+			end
 			else if (is_npc_proj == 1'b1)
 			begin
 				Red = 8'hff;
 				Green = 8'h00;
 				Blue = 8'hff;
-			end*/
+			end
 			// end projectiles
 			
 			// health bars, modify
@@ -200,7 +200,7 @@ module  color_mapper (	input					Clk,
 	
 	// Word Logic
 	// signals if the current pixel is part of the word FIGHT
-	word_FIGHT(.DrawX(DrawX),
+	word_FIGHT FIGHT_data(.DrawX(DrawX),
 					.DrawY(DrawY),
 					.active(start_l),
 					.start_x(FIGHT_x_start),
@@ -210,7 +210,7 @@ module  color_mapper (	input					Clk,
 					);
 	
 	// signals if the current pixel is part of the word DEFEAT
-	word_DEFEAT(.DrawX(DrawX),
+	word_DEFEAT DEFEAT_data(.DrawX(DrawX),
 					.DrawY(DrawY),
 					.active(lose_l),
 					.start_x(DEFEAT_x_start),
@@ -220,7 +220,7 @@ module  color_mapper (	input					Clk,
 					);
 	
 	// signals if the current pixel is part of the word VICTORY
-	word_VICTORY(.DrawX(DrawX),
+	word_VICTORY VICTORY_data(.DrawX(DrawX),
 					.DrawY(DrawY),
 					.active(win_l),
 					.start_x(VICTORY_x_start),

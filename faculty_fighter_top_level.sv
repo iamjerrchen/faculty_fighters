@@ -36,7 +36,7 @@ module faculty_fighter_top_level(
 																		DRAM_CLK      //SDRAM Clock
 											);
     
-    logic Reset_h, Clk;
+    logic Reset_h, Soft_Reset_h, Clk;
     logic [7:0] keycode;
 	 logic player_shoot_h, npc_shoot_h;
     
@@ -117,9 +117,9 @@ module faculty_fighter_top_level(
 	 
 	 ////////// ADD STUFF HERE ///////////
 	 
-	 logic is_player, is_npc, is_player_proj;
+	 logic is_player, is_npc, is_player_proj, is_npc_proj;
 	 logic player_pixel_on, npc_pixel_on;
-	 logic bullet_npc_contact;
+	 logic bullet_npc_contact, bullet_player_contact;
 	 
 	 logic [23:0] player_pixel, npc_pixel;
 	 logic [11:0] Player_RAM_addr, NPC_RAM_addr;
@@ -131,6 +131,7 @@ module faculty_fighter_top_level(
 	 parameter NPC_X_Init = 10'd360;
 	 parameter NPC_Y_Init = 10'd355;
 	 parameter Players_Proj_X_Speed = 10'd4;
+	 parameter NPCs_Proj_X_Speed = ~(10'd4) + 1'b1;
 	 
 	 logic [4:0] is_player_health, is_npc_health;
 	 parameter Player_Health_X = 10'd10;
@@ -138,11 +139,13 @@ module faculty_fighter_top_level(
 	 
 	 logic [9:0] Player_X_Size, Player_Y_Size, NPC_X_Size, NPC_Y_Size;
 	 logic [9:0] Player_X_curr, Player_Y_curr, NPC_X_curr, NPC_Y_curr;
-	 logic [9:0] Players_Proj_X_curr, Players_Proj_Y_curr;
-	 logic [9:0] Player_X_curr_center, Player_Y_curr_center;
+	 logic [9:0] Players_Proj_X_curr, Players_Proj_Y_curr, NPCs_Proj_X_curr, NPCs_Proj_Y_curr;
+	 logic [9:0] Player_X_curr_center, Player_Y_curr_center, NPC_X_curr_center, NPC_Y_curr_center;
 	 
 	 assign Player_X_curr_center = Player_X_curr + 10'd21;
 	 assign Player_Y_curr_center = Player_Y_curr + 10'd32;
+	 assign NPC_X_curr_center = NPC_X_curr + 10'd21;
+	 assign NPC_Y_curr_center = NPC_Y_curr + 10'd32;
 	 
 	 // Input Control
 	 logic Player_Up, Player_Right, Player_Left, NPC_Right, NPC_Left, NPC_Up;
@@ -194,6 +197,7 @@ module faculty_fighter_top_level(
 							.is_proj(is_player_proj)			// Whether pixel belongs to projectile or other
 							);
 							
+	 // Bullet VS NPC
 	 hitbox bullet_npc(.Obj_X(Players_Proj_X_curr),
 							.Obj_Y(Players_Proj_Y_curr),
 							.Target_X(NPC_X_curr),
@@ -201,6 +205,33 @@ module faculty_fighter_top_level(
 							.Target_X_Size(NPC_X_Size),
 							.Target_Y_Size(NPC_Y_Size),
 							.contact(bullet_npc_contact));
+							
+	 // projectile belongs to npc
+	 projectile npcs_bullet(.Clk(Clk),
+							.Reset(Reset_h || Soft_Reset_h),
+							.frame_clk(VGA_VS),
+							.Proj_X_Center(NPC_X_curr_center), // Shooter's Center
+							.Proj_Y_Center(NPC_Y_curr_center),
+							.Proj_X_Step(NPCs_Proj_X_Speed),
+							
+							.Proj_X_Curr_Pos(NPCs_Proj_X_curr),
+							.Proj_Y_Curr_Pos(NPCs_Proj_Y_curr),
+							
+							.activate(npc_shoot_h),
+							.contact(bullet_player_contact),
+							.DrawX(DrawX),
+							.DrawY(DrawY),		// Current pixel coordinates
+							.is_proj(is_npc_proj)			// Whether pixel belongs to projectile or other
+							);
+							
+	 // Bullet VS Player
+	 /*hitbox bullet_player(.Obj_X(NPCs_Proj_X_curr),
+							.Obj_Y(NPCs_Proj_Y_curr),
+							.Target_X(Player_X_curr),
+							.Target_Y(Player_Y_curr),
+							.Target_X_Size(Player_X_Size),
+							.Target_Y_Size(Player_Y_Size),
+							.contact(bullet_player_contact));*/
 												
     // Which signal should be frame_clk? VGA_VS
     player player_instance(.Clk(Clk),
@@ -277,6 +308,7 @@ module faculty_fighter_top_level(
 											.is_player(is_player),
 											.is_npc(is_npc),
 											.is_player_proj(is_player_proj),
+											.is_npc_proj(is_npc_proj),
 											.is_player_health(is_player_health),
 											.is_npc_health(is_npc_health),
 											
