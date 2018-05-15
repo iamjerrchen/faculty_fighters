@@ -5,11 +5,11 @@ This is a project developed for a course at the University of Illinois at Champa
 To run Faculty Fighters:
 1. Load the project file on the Quartus application. The project file should automatically include all necessary files.
 2. Open Qsys to generate an HDL file for the project's System on Chip.
-  - Click on the 'tools->Qsys'.
-  - Click on the 'Generate->Generate HDL'. Make sure verilog is selected as the HDL design file.
-  - On Quartus, add the newly generated verilog file to the project if it doesn't already exist. This can be done by:
-    - Right click files under 'Project Navigator' and select 'Add/Remove Files in Project'
-    - Click on the ellipsis to navigate the project folders to find the verilog file. It should be nested under a folder with 'soc' appended to the end and synthesis. Ex. project_root->faculty_fighter_soc->synthesis->faculty_fighter_soc.v.
+   - Click on the 'tools->Qsys'.
+   - Click on the 'Generate->Generate HDL'. Make sure verilog is selected as the HDL design file.
+   - On Quartus, add the newly generated verilog file to the project if it doesn't already exist. This can be done by:
+     - Right click files under 'Project Navigator' and select 'Add/Remove Files in Project'
+     - Click on the ellipsis to navigate the project folders to find the verilog file. It should be nested under a folder with 'soc' appended to the end and synthesis. Ex. project_root->faculty_fighter_soc->synthesis->faculty_fighter_soc.v.
 3. Compile and Synthesis the project.
 
 After the project has been compiled, the output file can be flashed onto the FPGA. You will need the USB-Blaster installed to flash it from the developer deivce to the FPGA through USB. This will need to be done before ths software can function with the hardware.
