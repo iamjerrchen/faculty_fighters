@@ -1,3 +1,5 @@
+# Faculty Fighters Instructions To Run
+
 This project was developed using Quartus II 15.0 (64-bit) on the device family Cyclone IV E. The device name of the FPGA is (EP4CE115F29C7).
 
 This is a project developed for a course at the University of Illinois at Champaign-Urbana, ECE385: Digital Systems Laboratory. For a detailed report on the project, please refer to the project proposal and report file under the documentation directory.
